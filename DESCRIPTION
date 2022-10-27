@@ -1,0 +1,34 @@
+Package: enONE
+Title: Epitranscriptional NAD-capped RNA analysis by spike-in based Omic-level Normalization and Evaluation
+Version: 0.1.0
+Authors@R: 
+    person(given = "Dean",
+           family = "Li",
+           role = c("aut", "cre"),
+           email = "lida@sioc.ac.cn")
+Description: enONE is an R package for performing spike-in based normalization on NAD-capped RNA sequencing data, as well as comparing and ranking the performance of different normalization strategies. enONE also provides a toolkit to handle NAD-RNA sequencing data. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
+Imports: 
+    cluster,
+    DESeq2,
+    dplyr,
+    edgeR,
+    fpc,
+    ggplot2,
+    ggpubr,
+    ggrepel,
+    limma,
+    MatrixGenerics,
+    methods,
+    paintingr,
+    plotly,
+    rlang,
+    rstatix,
+    S4Vectors,
+    stats,
+    stringr,
+    SummarizedExperiment,
+    tibble
