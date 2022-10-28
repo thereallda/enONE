@@ -4,12 +4,14 @@
 \alias{synEnrichment}
 \title{Enrichment level of synthetic RNA}
 \usage{
-synEnrichment(object, method = "TC")
+synEnrichment(object, method = "TC", log = TRUE)
 }
 \arguments{
 \item{object}{Enone object.}
 
 \item{method}{Which normalization methods to perform.}
+
+\item{log}{Whether to return \code{log2} values, default: TRUE.}
 }
 \value{
 enrichment level of synthetic RNA

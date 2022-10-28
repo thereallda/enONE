@@ -175,13 +175,14 @@ UseNormalization <- function(object, slot=c("sample","spike_in"), method) {
 #'
 #' @param object Enone object. 
 #' @param method Which normalization methods to perform. 
+#' @param log Whether to return \code{log2} values, default: TRUE. 
 #'
 #' @return enrichment level of synthetic RNA
 #' @export
 #'
 #' @importFrom SummarizedExperiment assay rowData
 #' @importFrom stringr str_extract
-synEnrichment <- function(object, method="TC") {
+synEnrichment <- function(object, method="TC", log=TRUE) {
   
   if (!any(SummarizedExperiment::rowData(object)$Synthetic)) {
     stop("Synthetic RNA id not provided in the object")
@@ -237,7 +238,14 @@ synEnrichment <- function(object, method="TC") {
   # calculate enrichment of synthetic RNA
   counts_norm <- counts_norm$dataNorm
   syn_id <- SummarizedExperiment::rowData(object)$Synthetic
-  syn_en <- counts_norm[syn_id,enrich_idx[1,]]/counts_norm[syn_id,enrich_idx[2,]]
+  # add 1 offset to avoid zero division (in log-scale)
+  syn_en <- log2(counts_norm[syn_id,enrich_idx[1,]]+1) / log2(counts_norm[syn_id,enrich_idx[2,]]+1)
+  
+  if (log) {
+    syn_en <- syn_en
+  } else {
+    syn_en <- 2^syn_en
+  }
   
   return(syn_en)
 }
