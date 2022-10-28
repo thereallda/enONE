@@ -97,19 +97,19 @@ enONE <- function(object,
     
   } else {
     
-    if (!neg.control %in% rownames(data)) {
+    if (!all(neg.control %in% rownames(data))) {
       stop("`neg.control` are not presented in the rownames of count matrix.")
     } else {
       neg.control.set <- neg.control  
     }
     
-    if (!is.null(pos.eval) & !pos.eval %in% rownames(data)) {
+    if (!is.null(pos.eval) & !all(pos.eval %in% rownames(data))) {
       stop("`pos.eval` are not presented in the rownames of count matrix.")
     } else {
       pos.eval.set <- pos.eval  
     }
     
-    if (!is.null(neg.eval) & !neg.eval %in% rownames(data)) {
+    if (!is.null(neg.eval) & !all(neg.eval %in% rownames(data))) {
       stop("`neg.eval` are not presented in the rownames of count matrix.")
     } else {
       neg.eval.set <- neg.eval  

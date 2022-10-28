@@ -239,7 +239,7 @@ synEnrichment <- function(object, method="TC", log=TRUE) {
   counts_norm <- counts_norm$dataNorm
   syn_id <- SummarizedExperiment::rowData(object)$Synthetic
   # add 1 offset to avoid zero division (in log-scale)
-  syn_en <- log2(counts_norm[syn_id,enrich_idx[1,]]+1) / log2(counts_norm[syn_id,enrich_idx[2,]]+1)
+  syn_en <- log2(counts_norm[syn_id, enrich_idx[1,]]+1) - log2(counts_norm[syn_id, enrich_idx[2,]]+1)
   
   if (log) {
     syn_en <- syn_en
