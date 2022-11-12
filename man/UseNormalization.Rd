@@ -14,7 +14,7 @@ UseNormalization(object, slot = c("sample", "spike_in"), method)
 \item{method}{Which normalization methods to perform.}
 }
 \value{
-object
+updated Enone
 }
 \description{
 Apply specific normalization method

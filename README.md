@@ -43,43 +43,39 @@ meta
 #> 1   C1   D0_ctrl.Input         1
 #> 2   C2   D0_ctrl.Input         2
 #> 3   C3   D0_ctrl.Input         3
-#> 4   C4   D0_ctrl.Input         4
-#> 5   C5   D0_ctrl.Input         5
-#> 6   C6  D14_ctrl.Input         1
-#> 7   C7  D14_ctrl.Input         2
-#> 8   C8  D14_ctrl.Input         3
-#> 9   C9  D14_ctrl.Input         4
-#> 10 C10  D14_ctrl.Input         5
-#> 11 C11  D0_ctrl.Enrich         1
-#> 12 C12  D0_ctrl.Enrich         2
-#> 13 C13  D0_ctrl.Enrich         3
-#> 14 C14  D0_ctrl.Enrich         4
-#> 15 C15  D0_ctrl.Enrich         5
-#> 16 C16 D14_ctrl.Enrich         1
-#> 17 C17 D14_ctrl.Enrich         2
-#> 18 C18 D14_ctrl.Enrich         3
-#> 19 C19 D14_ctrl.Enrich         4
-#> 20 C20 D14_ctrl.Enrich         5
-#> 21  N1    D0_nmn.Input         1
-#> 22  N2    D0_nmn.Input         2
-#> 23  N3    D0_nmn.Input         3
-#> 24  N4    D0_nmn.Input         4
-#> 25  N5    D0_nmn.Input         5
-#> 26  N6   D14_nmn.Input         1
-#> 27  N7   D14_nmn.Input         2
-#> 28  N8   D14_nmn.Input         3
-#> 29  N9   D14_nmn.Input         4
-#> 30 N10   D14_nmn.Input         5
-#> 31 N11   D0_nmn.Enrich         1
-#> 32 N12   D0_nmn.Enrich         2
-#> 33 N13   D0_nmn.Enrich         3
-#> 34 N14   D0_nmn.Enrich         4
-#> 35 N15   D0_nmn.Enrich         5
-#> 36 N16  D14_nmn.Enrich         1
-#> 37 N17  D14_nmn.Enrich         2
-#> 38 N18  D14_nmn.Enrich         3
-#> 39 N19  D14_nmn.Enrich         4
-#> 40 N20  D14_nmn.Enrich         5
+#> 4   C5   D0_ctrl.Input         4
+#> 5   C6  D14_ctrl.Input         1
+#> 6   C7  D14_ctrl.Input         2
+#> 7   C8  D14_ctrl.Input         3
+#> 8  C10  D14_ctrl.Input         4
+#> 9  C11  D0_ctrl.Enrich         1
+#> 10 C12  D0_ctrl.Enrich         2
+#> 11 C13  D0_ctrl.Enrich         3
+#> 12 C15  D0_ctrl.Enrich         4
+#> 13 C16 D14_ctrl.Enrich         1
+#> 14 C17 D14_ctrl.Enrich         2
+#> 15 C18 D14_ctrl.Enrich         3
+#> 16 C20 D14_ctrl.Enrich         4
+#> 17  N1    D0_nmn.Input         1
+#> 18  N2    D0_nmn.Input         2
+#> 19  N3    D0_nmn.Input         3
+#> 20  N4    D0_nmn.Input         4
+#> 21  N5    D0_nmn.Input         5
+#> 22  N6   D14_nmn.Input         1
+#> 23  N7   D14_nmn.Input         2
+#> 24  N8   D14_nmn.Input         3
+#> 25  N9   D14_nmn.Input         4
+#> 26 N10   D14_nmn.Input         5
+#> 27 N11   D0_nmn.Enrich         1
+#> 28 N12   D0_nmn.Enrich         2
+#> 29 N13   D0_nmn.Enrich         3
+#> 30 N14   D0_nmn.Enrich         4
+#> 31 N15   D0_nmn.Enrich         5
+#> 32 N16  D14_nmn.Enrich         1
+#> 33 N17  D14_nmn.Enrich         2
+#> 34 N18  D14_nmn.Enrich         3
+#> 35 N19  D14_nmn.Enrich         4
+#> 36 N20  D14_nmn.Enrich         5
 ```
 
 NAD-RNA-Sequencing data, with genes in rows and samples in columns.
@@ -87,18 +83,18 @@ NAD-RNA-Sequencing data, with genes in rows and samples in columns.
 ``` r
 counts.df <- read.csv('data/Counts.csv', row.names = 1)
 counts.df[1:3,]
-#>                    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C16 C17
-#> ENSCAFG00845015183  0  0  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0
-#> ENSCAFG00845015195  0  0  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0
-#> ENSCAFG00845015208  0  0  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0
-#>                    C18 C19 C20 N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14
-#> ENSCAFG00845015183   0   0   0  0  0  0  0  0  0  0  0  0   0   0   0   0   0
-#> ENSCAFG00845015195   0   0   0  0  0  0  0  0  0  0  0  0   0   0   0   0   0
-#> ENSCAFG00845015208   0   0   0  0  0  0  0  0  0  0  0  0   0   0   0   0   0
-#>                    N15 N16 N17 N18 N19 N20
-#> ENSCAFG00845015183   0   0   0   0   0   0
-#> ENSCAFG00845015195   0   0   0   0   0   0
-#> ENSCAFG00845015208   0   0   0   0   0   0
+#>                    C1 C2 C3 C5 C6 C7 C8 C10 C11 C12 C13 C15 C16 C17 C18 C20 N1
+#> ENSCAFG00845015183  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0   0  0
+#> ENSCAFG00845015195  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0   0  0
+#> ENSCAFG00845015208  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0   0  0
+#>                    N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14 N15 N16 N17 N18
+#> ENSCAFG00845015183  0  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0   0
+#> ENSCAFG00845015195  0  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0   0
+#> ENSCAFG00845015208  0  0  0  0  0  0  0  0   0   0   0   0   0   0   0   0   0
+#>                    N19 N20
+#> ENSCAFG00845015183   0   0
+#> ENSCAFG00845015195   0   0
+#> ENSCAFG00845015208   0   0
 ```
 
 ### Filtering low-expressed genes
@@ -107,8 +103,8 @@ counts.df[1:3,]
 keep <- filterByExpr(counts.df, group = meta$condition)
 counts_keep <- counts.df[keep,]
 dim(counts.df); dim(counts_keep)
-#> [1] 48735    40
-#> [1] 28685    40
+#> [1] 48735    36
+#> [1] 28795    36
 ```
 
 ### Create Enone object
@@ -137,12 +133,12 @@ Enone <- createEnone(data = counts_keep,
                      )
 Enone
 #> class: Enone 
-#> dim: 28685 40 
+#> dim: 28795 36 
 #> metadata(0):
 #> assays(1): ''
-#> rownames(28685): ENSCAFG00845015217 ENSCAFG00845015316 ... Syn1 Syn2
+#> rownames(28795): ENSCAFG00845015217 ENSCAFG00845015316 ... Syn1 Syn2
 #> rowData names(3): GeneID SpikeIn Synthetic
-#> colnames(40): C1 C2 ... N19 N20
+#> colnames(36): C1 C2 ... N19 N20
 #> colData names(5): id condition enrich replicate batch
 ```
 
@@ -150,33 +146,33 @@ Raw counts (sample + spike-in) can be accessed with
 
 ``` r
 assay(Enone)[1:3,];dim(assay(Enone))
-#>                      C1   C2   C3   C4   C5   C6  C7   C8  C9  C10 C11 C12 C13
-#> ENSCAFG00845015217   17   23  158   17   16   14   9   95  21   11  14  12  67
-#> ENSCAFG00845015316   56  108   88  123   86   47  63   47  51   49 125 136  93
-#> ENSCAFG00845015457 1699 1671 1541 2073 2866 1463 766 1455 958 1092 419 352 287
-#>                    C14 C15 C16 C17 C18 C19 C20   N1   N2   N3   N4   N5  N6  N7
-#> ENSCAFG00845015217  12   9   8  35  78  15   7   15   99   99  122   89   8 103
-#> ENSCAFG00845015316 135 102  36  64  91  46  92  108   88   78   69   78  43  45
-#> ENSCAFG00845015457 358 640 279 327 351 305 262 1907 1914 1127 1113 1766 854 748
-#>                     N8  N9  N10 N11 N12 N13 N14 N15 N16 N17 N18 N19 N20
-#> ENSCAFG00845015217  92 114   94  18  30  58  41  41   3  62  35  62  55
-#> ENSCAFG00845015316  65  70   89 168  75 100 146  75  39  30 102  68  71
-#> ENSCAFG00845015457 547 456 1145 269 279 151 189 386 162 263 158  90 360
-#> [1] 28685    40
+#>                      C1   C2   C3   C5   C6  C7   C8  C10 C11 C12 C13 C15 C16
+#> ENSCAFG00845015217   17   23  158   16   14   9   95   11  14  12  67   9   8
+#> ENSCAFG00845015316   56  108   88   86   47  63   47   49 125 136  93 102  36
+#> ENSCAFG00845015457 1699 1671 1541 2866 1463 766 1455 1092 419 352 287 640 279
+#>                    C17 C18 C20   N1   N2   N3   N4   N5  N6  N7  N8  N9  N10
+#> ENSCAFG00845015217  35  78   7   15   99   99  122   89   8 103  92 114   94
+#> ENSCAFG00845015316  64  91  92  108   88   78   69   78  43  45  65  70   89
+#> ENSCAFG00845015457 327 351 262 1907 1914 1127 1113 1766 854 748 547 456 1145
+#>                    N11 N12 N13 N14 N15 N16 N17 N18 N19 N20
+#> ENSCAFG00845015217  18  30  58  41  41   3  62  35  62  55
+#> ENSCAFG00845015316 168  75 100 146  75  39  30 102  68  71
+#> ENSCAFG00845015457 269 279 151 189 386 162 263 158  90 360
+#> [1] 28795    36
 ```
 
 Sample information is stored in `colData`
 
 ``` r
 colData(Enone)
-#> DataFrame with 40 rows and 5 columns
+#> DataFrame with 36 rows and 5 columns
 #>              id      condition      enrich replicate       batch
 #>     <character>    <character> <character> <numeric> <character>
 #> C1           C1  D0_ctrl.Input       Input         1          NA
 #> C2           C2  D0_ctrl.Input       Input         2          NA
 #> C3           C3  D0_ctrl.Input       Input         3          NA
-#> C4           C4  D0_ctrl.Input       Input         4          NA
-#> C5           C5  D0_ctrl.Input       Input         5          NA
+#> C5           C5  D0_ctrl.Input       Input         4          NA
+#> C6           C6 D14_ctrl.Input       Input         1          NA
 #> ...         ...            ...         ...       ...         ...
 #> N16         N16 D14_nmn.Enrich      Enrich         1          NA
 #> N17         N17 D14_nmn.Enrich      Enrich         2          NA
@@ -194,9 +190,10 @@ Enone <- enONE(Enone,
                ruv.norm = TRUE, ruv.k = 3,
                pam.krange = 2:6, pc.k = 3
                )
-#> The number of negative control genes for RUV: 1000 
-#> The number of positive evaluation genes: 500 
-#> The number of negative evaluation genes: 500 
+#> Gene set selection for normalization and assessment...
+#> - The number of negative control genes for normalization: 1000 
+#> - The number of positive evaluation genes: 500 
+#> - The number of negative evaluation genes: 500 
 #> Apply normalization...
 #> Perform assessment...
 ```
@@ -215,7 +212,7 @@ Selected gene sets are stored in `rowData`, including:
 
 ``` r
 rowData(Enone)
-#> DataFrame with 28685 rows and 6 columns
+#> DataFrame with 28795 rows and 6 columns
 #>                                GeneID   SpikeIn Synthetic NegControl
 #>                           <character> <logical> <logical>  <logical>
 #> ENSCAFG00845015217 ENSCAFG00845015217     FALSE     FALSE      FALSE
@@ -225,7 +222,7 @@ rowData(Enone)
 #> ENSCAFG00845015637 ENSCAFG00845015637     FALSE     FALSE      FALSE
 #> ...                               ...       ...       ...        ...
 #> FBgn0085753               FBgn0085753      TRUE     FALSE      FALSE
-#> FBgn0267511               FBgn0267511      TRUE     FALSE       TRUE
+#> FBgn0267511               FBgn0267511      TRUE     FALSE      FALSE
 #> FBgn0267505               FBgn0267505      TRUE     FALSE      FALSE
 #> Syn1                             Syn1     FALSE      TRUE      FALSE
 #> Syn2                             Syn2     FALSE      TRUE      FALSE
@@ -249,41 +246,25 @@ provided must be the same as the column names of rowData.
 
 ``` r
 getGeneSet(Enone, name = "NegControl")[1:5]
-#> [1] "FBgn0267987" "FBgn0265074" "FBgn0266906" "FBgn0031256" "FBgn0266032"
-```
-
-Normalized counts are stored in `counts` slot in which `sample` slot
-holds the counts from sample and `spike_in` slot for spike-in counts.
-
-``` r
-names(Enone@counts$sample)
-#>  [1] "TC"                  "UQ"                  "TMM"                
-#>  [4] "DESeq"               "PossionSeq"          "Raw"                
-#>  [7] "TC_RUVg_k1"          "TC_RUVs_k1"          "TC_RUVse_k1"        
-#> [10] "TC_RUVg_k2"          "TC_RUVs_k2"          "TC_RUVse_k2"        
-#> [13] "TC_RUVg_k3"          "TC_RUVs_k3"          "TC_RUVse_k3"        
-#> [16] "UQ_RUVg_k1"          "UQ_RUVs_k1"          "UQ_RUVse_k1"        
-#> [19] "UQ_RUVg_k2"          "UQ_RUVs_k2"          "UQ_RUVse_k2"        
-#> [22] "UQ_RUVg_k3"          "UQ_RUVs_k3"          "UQ_RUVse_k3"        
-#> [25] "TMM_RUVg_k1"         "TMM_RUVs_k1"         "TMM_RUVse_k1"       
-#> [28] "TMM_RUVg_k2"         "TMM_RUVs_k2"         "TMM_RUVse_k2"       
-#> [31] "TMM_RUVg_k3"         "TMM_RUVs_k3"         "TMM_RUVse_k3"       
-#> [34] "DESeq_RUVg_k1"       "DESeq_RUVs_k1"       "DESeq_RUVse_k1"     
-#> [37] "DESeq_RUVg_k2"       "DESeq_RUVs_k2"       "DESeq_RUVse_k2"     
-#> [40] "DESeq_RUVg_k3"       "DESeq_RUVs_k3"       "DESeq_RUVse_k3"     
-#> [43] "PossionSeq_RUVg_k1"  "PossionSeq_RUVs_k1"  "PossionSeq_RUVse_k1"
-#> [46] "PossionSeq_RUVg_k2"  "PossionSeq_RUVs_k2"  "PossionSeq_RUVse_k2"
-#> [49] "PossionSeq_RUVg_k3"  "PossionSeq_RUVs_k3"  "PossionSeq_RUVse_k3"
-#> [52] "Raw_RUVg_k1"         "Raw_RUVs_k1"         "Raw_RUVse_k1"       
-#> [55] "Raw_RUVg_k2"         "Raw_RUVs_k2"         "Raw_RUVse_k2"       
-#> [58] "Raw_RUVg_k3"         "Raw_RUVs_k3"         "Raw_RUVse_k3"
+#> [1] "FBgn0267987" "FBgn0266906" "FBgn0031256" "FBgn0266032" "FBgn0031285"
 ```
 
 Counts matrix can be accessed by `Counts`.
 
 ``` r
-Counts(Enone, slot='sample', method='DESeq_RUVs_k2')[1:3,]
-#> NULL
+Counts(Enone, slot='sample', method='Raw')[1:3,]
+#>                      C1   C2   C3   C5   C6  C7   C8  C10 C11 C12 C13 C15 C16
+#> ENSCAFG00845015217   17   23  158   16   14   9   95   11  14  12  67   9   8
+#> ENSCAFG00845015316   56  108   88   86   47  63   47   49 125 136  93 102  36
+#> ENSCAFG00845015457 1699 1671 1541 2866 1463 766 1455 1092 419 352 287 640 279
+#>                    C17 C18 C20   N1   N2   N3   N4   N5  N6  N7  N8  N9  N10
+#> ENSCAFG00845015217  35  78   7   15   99   99  122   89   8 103  92 114   94
+#> ENSCAFG00845015316  64  91  92  108   88   78   69   78  43  45  65  70   89
+#> ENSCAFG00845015457 327 351 262 1907 1914 1127 1113 1766 854 748 547 456 1145
+#>                    N11 N12 N13 N14 N15 N16 N17 N18 N19 N20
+#> ENSCAFG00845015217  18  30  58  41  41   3  62  35  62  55
+#> ENSCAFG00845015316 168  75 100 146  75  39  30 102  68  71
+#> ENSCAFG00845015457 269 279 151 189 386 162 263 158  90 360
 ```
 
 You can list all applied normalization methods by `listNormalization`.
@@ -317,20 +298,20 @@ order).
 
 ``` r
 head(getMetrics(Enone))
-#>                 BIO_SIL ASSAY_SIL BATCH_SIL   PAM_SIL     RLE_MED    RLE_IQR
-#> TMM_RUVs_k1   0.2497078 0.3644590         0 0.6805773 0.001507430 0.03396857
-#> TMM_RUVs_k2   0.2726703 0.3485566         0 0.6866165 0.001237167 0.02817226
-#> TMM_RUVs_k3   0.1234907 0.3588535         0 0.6914945 0.001179066 0.02580658
-#> DESeq_RUVs_k1 0.2657677 0.3609938         0 0.6791534 0.002286996 0.03567870
-#> UQ_RUVs_k1    0.2277363 0.3658157         0 0.6828071 0.002236792 0.03246888
-#> DESeq_RUVs_k2 0.2892089 0.3457821         0 0.6846519 0.002195862 0.03031955
-#>               EXP_WV_COR EXP_UV_COR
-#> TMM_RUVs_k1    0.9392733  0.2622631
-#> TMM_RUVs_k2    0.9220817  0.2401163
-#> TMM_RUVs_k3    0.6998099  0.2394629
-#> DESeq_RUVs_k1  0.9369537  0.2594474
-#> UQ_RUVs_k1     0.9352505  0.2981237
-#> DESeq_RUVs_k2  0.9258984  0.2379280
+#>                        BIO_SIL ASSAY_SIL BATCH_SIL   PAM_SIL      RLE_MED
+#> TMM_RUVse_k3       0.004010675 0.3672915         0 0.7215727 0.0012331000
+#> TMM_RUVs_k3        0.264969797 0.3526664         0 0.6917263 0.0013922471
+#> TMM_RUVs_k2        0.273545725 0.3529028         0 0.6912465 0.0014106631
+#> PossionSeq_RUVs_k2 0.162922204 0.3557378         0 0.6791057 0.0001844717
+#> TMM_RUVs_k1        0.323222896 0.3572111         0 0.6832383 0.0017360384
+#> DESeq_RUVs_k3      0.329558547 0.3506919         0 0.6919255 0.0022146643
+#>                       RLE_IQR EXP_WV_COR EXP_UV_COR
+#> TMM_RUVse_k3       0.02174805  0.8464516  0.3908795
+#> TMM_RUVs_k3        0.02437620  0.6853092  0.1459999
+#> TMM_RUVs_k2        0.02708899  0.7287250  0.1508830
+#> PossionSeq_RUVs_k2 0.07336386  0.9182946  0.2784424
+#> TMM_RUVs_k1        0.03318628  0.8619031  0.2170877
+#> DESeq_RUVs_k3      0.02595740  0.7217122  0.1135383
 ```
 
 Check the performance of normalizations (ranked by scores in decreasing
@@ -338,20 +319,20 @@ order). Higher score means better performance.
 
 ``` r
 head(getScore(Enone))
-#>               BIO_SIL ASSAY_SIL BATCH_SIL PAM_SIL RLE_MED RLE_IQR EXP_WV_COR
-#> TMM_RUVs_k1        52        51         1      26      41      22         52
-#> TMM_RUVs_k2        57        31         1      33      46      31         39
-#> TMM_RUVs_k3        43        44         1      38      47      38         10
-#> DESeq_RUVs_k1      55        49         1      23      27      20         50
-#> UQ_RUVs_k1         50        52         1      29      29      25         49
-#> DESeq_RUVs_k2      58        27         1      31      31      27         42
-#>               EXP_UV_COR    SCORE
-#> TMM_RUVs_k1           53 42.42857
-#> TMM_RUVs_k2           58 42.14286
-#> TMM_RUVs_k3           59 39.85714
-#> DESeq_RUVs_k1         54 39.71429
-#> UQ_RUVs_k1            42 39.42857
-#> DESeq_RUVs_k2         60 39.42857
+#>                    BIO_SIL ASSAY_SIL BATCH_SIL PAM_SIL RLE_MED RLE_IQR
+#> TMM_RUVse_k3            29        54         1      48      47      45
+#> TMM_RUVs_k3             50        36         1      36      46      37
+#> TMM_RUVs_k2             52        37         1      35      45      31
+#> PossionSeq_RUVs_k2      43        43         1      17      59       7
+#> TMM_RUVs_k1             55        47         1      25      39      22
+#> DESeq_RUVs_k3           56        32         1      37      34      35
+#>                    EXP_WV_COR EXP_UV_COR    SCORE
+#> TMM_RUVse_k3               15         29 38.14286
+#> TMM_RUVs_k3                 3         58 38.00000
+#> TMM_RUVs_k2                 8         57 37.85714
+#> PossionSeq_RUVs_k2         43         50 37.42857
+#> TMM_RUVs_k1                19         53 37.14286
+#> DESeq_RUVs_k3               6         60 37.14286
 ```
 
 #### PCA biplot
@@ -364,13 +345,7 @@ pca.eval <- prcomp(enScore[,-c(3, 9)], scale = TRUE)
 ggPCA_Biplot(pca.eval, score = enScore$SCORE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
-
-save
-
-``` r
-save(Enone, file='data/NormAssess.rda')
-```
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 You can turn on the interactive mode to further explore the performance
 of each method.
@@ -379,16 +354,16 @@ of each method.
 ggPCA_Biplot(pca.eval, score = Enone@enone_score$SCORE, interactive = TRUE)
 ```
 
-### The best performance
+### Use suitable normalization
 
 ``` r
-# select the best normalization
-best.norm <- rownames(enScore[1,])
-Enone <- UseNormalization(Enone, slot = 'sample', method = best.norm)
-best.norm.data <- Counts(Enone, slot = 'sample', method = best.norm)
-best.norm.factors <- getFactor(Enone, slot = 'sample', method = best.norm)
-best.norm
-#> [1] "TMM_RUVs_k1"
+# select normalization
+norm.method <- rownames(enScore[1,])
+Enone <- UseNormalization(Enone, slot = 'sample', method = norm.method)
+norm.data <- Counts(Enone, slot = 'sample', method = norm.method)
+norm.factors <- getFactor(Enone, slot = 'sample', method = norm.method)
+norm.method
+#> [1] "TMM_RUVse_k3"
 ```
 
 ### Effect of normalization
@@ -397,17 +372,17 @@ we use PCA to visualize the counts from samples before and after the
 normalization.
 
 ``` r
-samples_name <- paste(meta$condition, meta$replicate, sep='.')
+samples_name <- paste(Enone$condition, Enone$replicate, sep='.')
 p1 <- ggPCA(log1p(Counts(Enone, slot='sample', 'Raw')), 
-            color = meta$condition,
+            color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('Before normalization')
-p2 <- ggPCA(log1p(best.norm.data), 
-            color = meta$condition,
+p2 <- ggPCA(log1p(norm.data), 
+            color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('After normalization')
 p1 + p2
 ```
 
-<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 ### FindEnrichment
 
@@ -420,15 +395,15 @@ Default criteria for enriched genes is log2-Fold-Change
 (enrichment/input) \>= 1 & adjusted p-value \< 0.05.
 
 ``` r
-Enone <- FindEnrichment(Enone, slot='sample', method = best.norm, 
+Enone <- FindEnrichment(Enone, slot='sample', method = norm.method, 
                         logfc.cutoff = 1, p.cutoff = 0.05)
 # get filtered enrichment results
-res.best.ls <- getEnrichment(Enone, slot='sample', filter=TRUE)
-unlist(lapply(res.best.ls, nrow))
+res.sig.ls <- getEnrichment(Enone, slot='sample', filter=TRUE)
+unlist(lapply(res.sig.ls, nrow))
 #>   D0_ctrl.Enrich_D0_ctrl.Input D14_ctrl.Enrich_D14_ctrl.Input 
-#>                           2415                           2122 
+#>                           2167                           2102 
 #>     D0_nmn.Enrich_D0_nmn.Input   D14_nmn.Enrich_D14_nmn.Input 
-#>                           2854                           2336
+#>                           2688                           2402
 ```
 
 Each enrichment table is a `data.frame` with a list of genes as rows,
@@ -447,49 +422,70 @@ The following columns are present in the table:
     applied.
 
 ``` r
-head(res.best.ls[[1]])
+head(res.sig.ls[[1]])
 #>               GeneID    logFC    logCPM       LR        PValue           FDR
-#> 1 ENSCAFG00845009430 2.481037  7.643686 687.4037 1.640198e-151 2.368446e-147
-#> 2 ENSCAFG00845002083 3.146779 12.583165 680.5765 5.006772e-150 3.614889e-146
-#> 3 ENSCAFG00845007784 3.083828  8.694926 620.1862 6.811682e-137 3.278690e-133
-#> 4 ENSCAFG00845023387 2.635624  7.121038 598.5490 3.462573e-132 1.249989e-128
-#> 5 ENSCAFG00845021180 3.539566  7.372190 588.6528 4.919727e-130 1.420817e-126
-#> 6 ENSCAFG00845030865 2.830493 11.090549 580.8749 2.419806e-128 5.339311e-125
+#> 1 ENSCAFG00845007784 2.959802  8.717648 509.4189 8.484765e-113 1.231648e-108
+#> 2 ENSCAFG00845002083 3.157457 12.584706 375.8864  9.784997e-84  7.101951e-80
+#> 3 ENSCAFG00845009430 2.510118  7.642940 340.5231  4.908601e-76  2.375108e-72
+#> 4 ENSCAFG00845000887 2.287440  7.351301 299.2720  4.746529e-67  1.722515e-63
+#> 5 ENSCAFG00845007809 3.177614  6.102379 295.1592  3.736355e-66  1.084738e-62
+#> 6 ENSCAFG00845016135 2.327771  9.398165 293.5746  8.273551e-66  2.001648e-62
 ```
 
 Reduce list of enrichment and visualize with violin-box plot.
 
 ``` r
-nad_df1 <- reduceRes(res.best.ls, fc.col = 'logFC')
+nad_df1 <- reduceRes(res.sig.ls, logfc.col = 'logFC')
 nad_df1$Group <- gsub('\\..*', '', nad_df1$Group)
 nad_df1$Group <- factor(nad_df1$Group, levels = unique(nad_df1$Group))
-bxp1 <- BetweenStatPlot(nad_df1, x='Group', y='logFC', color='Group', step.increase = 0.6)
+bxp1 <- BetweenStatPlot(nad_df1, x='Group', y='logFC', color='Group', 
+                        step.increase = 0.6, add.p = 'p')
 bxp1
 ```
 
-<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
+
+save data
+
+``` r
+save(Enone, file='data/Enone.RData')
+```
 
 ## Handling spike-in
 
 Normalization for counts from spike-in.
 
 ``` r
-Enone <- UseNormalization(Enone, slot="spike_in", method="TMM_RUVs_k1")
+Enone <- UseNormalization(Enone, slot="spike_in", method=norm.method)
 ```
 
 And we can find enriched genes for spike-in.
 
 ``` r
-Enone <- FindEnrichment(Enone, slot='spike_in', method = "TMM_RUVs_k1", 
+Enone <- FindEnrichment(Enone, slot='spike_in', method = norm.method, 
                         logfc.cutoff = 1, p.cutoff = 0.05)
 # get filtered enrichment results
 res.spikein.ls <- getEnrichment(Enone, slot='spike_in', filter=TRUE)
 unlist(lapply(res.spikein.ls, nrow))
 #>   D0_ctrl.Enrich_D0_ctrl.Input D14_ctrl.Enrich_D14_ctrl.Input 
-#>                           1797                           1905 
+#>                           2044                           2154 
 #>     D0_nmn.Enrich_D0_nmn.Input   D14_nmn.Enrich_D14_nmn.Input 
-#>                           2500                           2108
+#>                           2084                           1980
 ```
+
+Likewise, enriched genes from spike-in can be visualized with
+`BetweenStatPlot`
+
+``` r
+nad_df2 <- reduceRes(res.spikein.ls, logfc.col = 'logFC')
+nad_df2$Group <- gsub('\\..*', '', nad_df2$Group)
+nad_df2$Group <- factor(nad_df2$Group, levels = unique(nad_df2$Group))
+bxp2 <- BetweenStatPlot(nad_df2, x='Group', y='logFC', color='Group', 
+                        step.increase = 0.6, add.p = 'p')
+bxp2
+```
+
+<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
 
 ## Handling synthetic RNA
 
@@ -499,39 +495,59 @@ after normalization by “TC”.
 
 ``` r
 synEnrichment(Enone)
-#>           C11       C12        C13        C14        C15       C16       C17
-#> Syn1 10.30239 9.5633073 11.9988271 13.4944422 12.1002205 10.635371 11.207418
-#> Syn2  0.62150 0.6569443  0.7162061  0.5145485  0.7067261  0.734082  1.177102
-#>             C18        C19        C20       N11       N12       N13       N14
-#> Syn1 11.7970481 10.7142104 13.2458422 9.9385797 8.6947696 8.2665876 8.7464619
-#> Syn2  0.7337764  0.7252286  0.6503792 0.6715279 0.5338146 0.7401981 0.7669007
-#>            N15      N16       N17       N18       N19       N20
-#> Syn1 8.6735671 8.449552 9.6659665 9.3115319 9.0269418 9.5399754
-#> Syn2 0.9274045 0.556634 0.8008928 0.9111429 0.8886355 0.9476376
+#>             C11        C12        C13        C15       C16       C17        C18
+#> Syn1  3.1445149  3.0556877  3.3446099  3.3647074  3.229864 3.2820948  3.3516701
+#> Syn2 -0.6228232 -0.5530273 -0.4326226 -0.4529038 -0.410781 0.2196065 -0.4113922
+#>             C20        N11        N12        N13        N14         N15
+#> Syn1  3.4897014  3.0351266  2.8620914  2.7868611  2.8485971  2.82069423
+#> Syn2 -0.5708432 -0.5039453 -0.7790745 -0.3796704 -0.3358998 -0.09417245
+#>             N16        N17        N18        N19        N20
+#> Syn1  2.8462100  3.0155334  2.9511332  2.9144086  3.0072205
+#> Syn2 -0.7515145 -0.2863579 -0.1185875 -0.1493189 -0.0683519
 ```
 
-Or use “TMM_RUVs_k1”
+Or use “TMM_RUVse_k3”
 
 ``` r
-synEnrichment(Enone, method="TMM_RUVs_k1")
-#>            C11       C12       C13        C14      C15      C16       C17
-#> Syn1 8.4460256 8.0827082 10.173062 10.6444160 9.942493 9.300287 11.050135
-#> Syn2 0.8890677 0.9433503  1.065974  0.7408351 1.011560 1.030574  1.628207
-#>            C18      C19        C20      N11       N12      N13      N14
-#> Syn1 10.296783 9.913194 11.2715323 7.951411 7.5319653 7.423026 7.064656
-#> Syn2  1.052679 1.007248  0.9293816 1.022557 0.8766309 1.179521 1.148703
-#>           N15       N16      N17      N18      N19      N20
-#> Syn1 7.354711 6.9928306 8.632005 7.898809 7.634146 7.952670
-#> Syn2 1.379023 0.8451117 1.206227 1.357846 1.257496 1.296127
+synEnrichment(Enone, method=norm.method)
+#>             C11       C12        C13       C15       C16        C17        C18
+#> Syn1  1.8779026  1.830769  2.0822951  1.954577  2.118178 2.46066199  2.1739701
+#> Syn2 -0.4668758 -0.465956 -0.3319655 -0.385002 -0.345663 0.09298064 -0.3170932
+#>            C20         N11        N12          N13        N14       N15
+#> Syn1  2.101352  2.24788306  2.2205275  2.177430605  1.8692839 2.1546966
+#> Syn2 -0.466793 -0.06014786 -0.2154541 -0.004751993 -0.1540691 0.1487517
+#>             N16        N17         N18        N19        N20
+#> Syn1  1.9731376  2.2768137  1.99907002  1.9448659 2.12529094
+#> Syn2 -0.3770841 -0.0271773 -0.05731098 -0.1014316 0.03365334
 ```
 
-Compared to “TC”, “TMM_RUVs_k1” give enrichment level with less
+Compared to “TC”, “TMM_RUVse_k3” gave enrichment level with less
 variation
 
 ``` r
-apply(synEnrichment(Enone), 1, sd); apply(synEnrichment(Enone, method="TMM_RUVs_k1"), 1, sd)
+apply(synEnrichment(Enone), 1, sd); apply(synEnrichment(Enone, method=norm.method), 1, sd)
 #>      Syn1      Syn2 
-#> 1.5858484 0.1599429
-#>     Syn1     Syn2 
-#> 1.407342 0.215011
+#> 0.2202541 0.2563932
+#>      Syn1      Syn2 
+#> 0.1640549 0.2047313
 ```
+
+synthetic RNA enrichment levels can be visualized with dot plot
+
+``` r
+syn_level <- synEnrichment(Enone, method=norm.method, log=TRUE)
+syn_df <- as.data.frame(syn_level) %>% 
+  rownames_to_column("syn_id") %>% 
+  pivot_longer(cols = -syn_id,
+               names_to = "id",
+               values_to = "logFC") %>% 
+  left_join(meta[,c("id","condition")], by="id")
+# remove suffix of condition
+syn_df$condition <- gsub("\\..*", "", syn_df$condition)
+
+ggDotPlot(syn_df, x="condition", y="logFC", fill="condition") +
+  facet_wrap(~syn_id)
+#> Bin width defaults to 1/30 of the range of the data. Pick better value with `binwidth`.
+```
+
+<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />

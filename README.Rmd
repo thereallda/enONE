@@ -127,16 +127,11 @@ You can get specific gene set by `getGeneSet`. Name of the gene set provided mus
 getGeneSet(Enone, name = "NegControl")[1:5]
 ```
 
-Normalized counts are stored in `counts` slot in which `sample` slot holds the counts from sample and `spike_in` slot for spike-in counts. 
-
-```{r}
-names(Enone@counts$sample)
-```
 
 Counts matrix can be accessed by `Counts`. 
 
 ```{r}
-Counts(Enone, slot='sample', method='DESeq_RUVs_k2')[1:3,]
+Counts(Enone, slot='sample', method='Raw')[1:3,]
 ```
 
 You can list all applied normalization methods by `listNormalization`.
@@ -167,27 +162,21 @@ pca.eval <- prcomp(enScore[,-c(3, 9)], scale = TRUE)
 ggPCA_Biplot(pca.eval, score = enScore$SCORE)
 ```
 
-save
-
-```{r,eval=FALSE}
-save(Enone, file='data/NormAssess.rda')
-```
-
 You can turn on the interactive mode to further explore the performance of each method. 
 
 ```{r,warning=FALSE,eval=FALSE}
 ggPCA_Biplot(pca.eval, score = Enone@enone_score$SCORE, interactive = TRUE)
 ```
 
-### The best performance
+### Use suitable normalization 
 
 ```{r}
-# select the best normalization
-best.norm <- rownames(enScore[1,])
-Enone <- UseNormalization(Enone, slot = 'sample', method = best.norm)
-best.norm.data <- Counts(Enone, slot = 'sample', method = best.norm)
-best.norm.factors <- getFactor(Enone, slot = 'sample', method = best.norm)
-best.norm
+# select normalization
+norm.method <- rownames(enScore[1,])
+Enone <- UseNormalization(Enone, slot = 'sample', method = norm.method)
+norm.data <- Counts(Enone, slot = 'sample', method = norm.method)
+norm.factors <- getFactor(Enone, slot = 'sample', method = norm.method)
+norm.method
 ```
 
 ### Effect of normalization
@@ -195,12 +184,12 @@ best.norm
 we use PCA to visualize the counts from samples before and after the normalization.
 
 ```{r,fig.width=12, fig.height=6}
-samples_name <- paste(meta$condition, meta$replicate, sep='.')
+samples_name <- paste(Enone$condition, Enone$replicate, sep='.')
 p1 <- ggPCA(log1p(Counts(Enone, slot='sample', 'Raw')), 
-            color = meta$condition,
+            color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('Before normalization')
-p2 <- ggPCA(log1p(best.norm.data), 
-            color = meta$condition,
+p2 <- ggPCA(log1p(norm.data), 
+            color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('After normalization')
 p1 + p2
 ```
@@ -214,11 +203,11 @@ Enriched genes are saved at slots `Enone@enrichment` (all) and `Enone@enrichment
 Default criteria for enriched genes is log2-Fold-Change (enrichment/input) >= 1 & adjusted p-value < 0.05. 
 
 ```{r}
-Enone <- FindEnrichment(Enone, slot='sample', method = best.norm, 
+Enone <- FindEnrichment(Enone, slot='sample', method = norm.method, 
                         logfc.cutoff = 1, p.cutoff = 0.05)
 # get filtered enrichment results
-res.best.ls <- getEnrichment(Enone, slot='sample', filter=TRUE)
-unlist(lapply(res.best.ls, nrow))
+res.sig.ls <- getEnrichment(Enone, slot='sample', filter=TRUE)
+unlist(lapply(res.sig.ls, nrow))
 ```
 
 Each enrichment table is a `data.frame` with a list of genes as rows, and associated information as columns (GeneID, logFC, p-values, etc.). The following columns are present in the table: 
@@ -231,35 +220,55 @@ Each enrichment table is a `data.frame` with a list of genes as rows, and associ
 - `FDR`: False discovery rate of the p-value, default "BH" method is applied. 
 
 ```{r}
-head(res.best.ls[[1]])
+head(res.sig.ls[[1]])
 ```
 
 Reduce list of enrichment and visualize with violin-box plot.
 
 ```{r}
-nad_df1 <- reduceRes(res.best.ls, fc.col = 'logFC')
+nad_df1 <- reduceRes(res.sig.ls, logfc.col = 'logFC')
 nad_df1$Group <- gsub('\\..*', '', nad_df1$Group)
 nad_df1$Group <- factor(nad_df1$Group, levels = unique(nad_df1$Group))
-bxp1 <- BetweenStatPlot(nad_df1, x='Group', y='logFC', color='Group', step.increase = 0.6)
+bxp1 <- BetweenStatPlot(nad_df1, x='Group', y='logFC', color='Group', 
+                        step.increase = 0.6, add.p = 'p')
 bxp1
 ```
+
+save data
+
+```{r,eval=FALSE}
+save(Enone, file='data/Enone.RData')
+```
+
+
 
 ## Handling spike-in 
 
 Normalization for counts from spike-in.  
 
 ```{r}
-Enone <- UseNormalization(Enone, slot="spike_in", method="TMM_RUVs_k1")
+Enone <- UseNormalization(Enone, slot="spike_in", method=norm.method)
 ```
 
 And we can find enriched genes for spike-in. 
 
 ```{r}
-Enone <- FindEnrichment(Enone, slot='spike_in', method = "TMM_RUVs_k1", 
+Enone <- FindEnrichment(Enone, slot='spike_in', method = norm.method, 
                         logfc.cutoff = 1, p.cutoff = 0.05)
 # get filtered enrichment results
 res.spikein.ls <- getEnrichment(Enone, slot='spike_in', filter=TRUE)
 unlist(lapply(res.spikein.ls, nrow))
+```
+
+Likewise, enriched genes from spike-in can be visualized with `BetweenStatPlot`
+
+```{r}
+nad_df2 <- reduceRes(res.spikein.ls, logfc.col = 'logFC')
+nad_df2$Group <- gsub('\\..*', '', nad_df2$Group)
+nad_df2$Group <- factor(nad_df2$Group, levels = unique(nad_df2$Group))
+bxp2 <- BetweenStatPlot(nad_df2, x='Group', y='logFC', color='Group', 
+                        step.increase = 0.6, add.p = 'p')
+bxp2
 ```
 
 ## Handling synthetic RNA
@@ -270,14 +279,31 @@ You can calculate the enrichment of synthetic RNA, if provided, using `synEnrich
 synEnrichment(Enone)
 ```
 
-Or use "TMM_RUVs_k1"
+Or use "TMM_RUVse_k3"
 
 ```{r}
-synEnrichment(Enone, method="TMM_RUVs_k1")
+synEnrichment(Enone, method=norm.method)
 ```
 
-Compared to "TC", "TMM_RUVs_k1" give enrichment level with less variation
+Compared to "TC", "TMM_RUVse_k3" gave enrichment level with less variation
 
 ```{r}
-apply(synEnrichment(Enone), 1, sd); apply(synEnrichment(Enone, method="TMM_RUVs_k1"), 1, sd)
+apply(synEnrichment(Enone), 1, sd); apply(synEnrichment(Enone, method=norm.method), 1, sd)
+```
+
+synthetic RNA enrichment levels can be visualized with dot plot
+
+```{r}
+syn_level <- synEnrichment(Enone, method=norm.method, log=TRUE)
+syn_df <- as.data.frame(syn_level) %>% 
+  rownames_to_column("syn_id") %>% 
+  pivot_longer(cols = -syn_id,
+               names_to = "id",
+               values_to = "logFC") %>% 
+  left_join(meta[,c("id","condition")], by="id")
+# remove suffix of condition
+syn_df$condition <- gsub("\\..*", "", syn_df$condition)
+
+ggDotPlot(syn_df, x="condition", y="logFC", fill="condition") +
+  facet_wrap(~syn_id)
 ```

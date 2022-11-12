@@ -11,7 +11,7 @@
 #' @name FindEnrichment 
 #' @aliases FindEnrichment  FindEnrichment,Enone,character,character,numeric,numeric-method
 #' 
-#' @return data.frame
+#' @return updated Enone 
 #' @export
 #'
 FindEnrichment <-  function(object, slot=c("sample","spike_in"), method, 
@@ -74,7 +74,7 @@ FindEnrichment <-  function(object, slot=c("sample","spike_in"), method,
 #' @param slot Which slot, one of \code{sample} or \code{spike_in}.  
 #' @param method Which normalization methods to perform. 
 #'
-#' @return object
+#' @return updated Enone
 #' @export
 #' 
 #' @importFrom SummarizedExperiment assay rowData
@@ -443,20 +443,20 @@ ggPCA_Biplot <- function(object, score, pt.label=TRUE, interactive=FALSE) {
 #' @param res.ls Named list of differential analysis results tables. 
 #' Each elements in the list correspond to a table of differential analysis 
 #' results between two groups of samples. 
-#' @param lfc.col Column name of the log fold-change. 
+#' @param logfc.col Column name of the log fold-change. 
 #' @param levels Factor levels of the groups, default order by the element order of \code{res.ls}. 
 #'
 #' @return data.frame
 #' @export
 #'
 #' @import dplyr
-reduceRes <- function(res.ls, lfc.col, levels=names(res.ls)) {
+reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
   df <- data.frame()
   for (id in names(res.ls)) {
     curr <- res.ls[[grep(id, names(res.ls), value=TRUE)]] 
     df1 <- curr %>% 
       dplyr::mutate(Group = factor(rep(id, nrow(curr)), levels = levels)) %>% 
-      dplyr::select(GeneID, !!sym(lfc.col), Group)
+      dplyr::select(GeneID, !!sym(logfc.col), Group)
     df <- rbind(df, df1)
   }
   return(df)
@@ -629,28 +629,26 @@ edgeRDE <- function(counts,
 ggDotPlot <- function(data, x, y, fill = NULL, palette = NULL) {
   
   if (!is.null(fill) & is.null(palette)) {
-    palette <- paintingr::paint_palette("Splash",length(unique(data[,fill])),"continuous")
+    palette <- paintingr::paint_palette("Splash",length(unique(data[[fill]])),"continuous")
   }
   
   if (!is.null(fill)) {
-    ggplot(data, aes_string(x, y, fill = fill)) +
-    geom_dotplot(binaxis = "y", stackdir = "center", color = NA, 
-                 dotsize = 0.8, position = "dodge") +
-    stat_summary(fun.data = .mean_sd, size = 0.5, shape = 19, 
-                 position = position_dodge(width=0.9), show.legend = FALSE) +
-    theme_minimal() +
-    scale_fill_manual(values = palette) +
-    labs(x="", y="Fold Change")
+    dp <- ggplot(data, aes_string(x, y, fill = fill)) +
+      scale_fill_manual(values = palette)
   } else {
-    ggplot(data, aes_string(x, y)) +
+    dp <- ggplot(data, aes_string(x, y))
+  }
+  
+  dp <- dp +
     geom_dotplot(binaxis = "y", stackdir = "center", color = NA, 
                  dotsize = 0.8, position = "dodge") +
     stat_summary(fun.data = .mean_sd, size = 0.5, shape = 19, 
                  position = position_dodge(width=0.9), show.legend = FALSE) +
-    theme_minimal() +
-    labs(x="", y="Fold Change")
-  }
-
+    theme_classic() +
+    theme(strip.background = element_blank()) +
+    theme(axis.text = element_text(color = 'black')) +
+    labs(x="")
+  return(dp)
 }
 
 #' Statistics summary (mean and +/- sd)

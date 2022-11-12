@@ -60,40 +60,14 @@ enONE <- function(object,
   
   ## gene selection 
   if (auto) {
-    ### 1. negative control genes for RUV
-    cat(paste("The number of negative control genes for RUV:",n.neg.control,"\n"))
-    designMat <- model.matrix(~0+enrich.group)
-    deg.en <- edgeRDE(counts_sp,
-                      group = enrich.group,
-                      design.formula = as.formula("~0+condition"),
-                      contrast.df = data.frame(Group1=enrich.id, Group2=input.id)
-    )
-    # top 1000 (default) non-sig de 
-    res_tab <- deg.en$res.ls[[paste(enrich.id, input.id, sep="_")]]
-    # res_tab <- subset(res_tab, FDR > 0.05)
-    neg.control.set <- head(res_tab[order(res_tab$FDR, decreasing = TRUE),]$GeneID, n=n.neg.control)
+    genes.ls <- GeneSelection(object, 
+                              n.neg.control = n.neg.control,
+                              n.pos.eval = n.pos.eval,
+                              n.neg.eval = n.neg.eval)
     
-    ### 2. positive evaluation genes (default 500)
-    # if provided, preclude synthetic RNA from evaluation set 
-    cat(paste("The number of positive evaluation genes:",n.pos.eval,"\n"))
-    deg.en <- edgeRDE(counts_nsp[!rownames(counts_nsp) %in% synthetic.id,],
-                      group = enrich.group,
-                      design.formula = as.formula("~0+condition"),
-                      contrast.df = data.frame(Group1=enrich.id, Group2=input.id)
-    )
-    res_tab <- deg.en$res.ls[[paste(enrich.id, input.id, sep="_")]]
-    pos.eval.set <- head(res_tab[order(res_tab$FDR),]$GeneID, n=n.pos.eval)
-    
-    ### 3. negative evaluation genes (default 500)
-    # if provided, preclude synthetic RNA from evaluation set 
-    cat(paste("The number of negative evaluation genes:",n.neg.eval,"\n"))
-    de.all <- edgeRDE(counts_nsp[!rownames(counts_nsp) %in% synthetic.id,],
-                      group = bio.group,
-                      design.formula = as.formula("~condition"),
-                      coef = 2:length(unique(bio.group))
-    )
-    res_tab <- de.all$res.ls[[1]]
-    neg.eval.set <- head(res_tab[order(res_tab$FDR, decreasing = TRUE),]$GeneID, n = n.neg.eval)
+    neg.control.set <- genes.ls[["NegControl"]]
+    pos.eval.set <- genes.ls[["PosEvaluation"]]
+    neg.eval.set <- genes.ls[["NegEvaluation"]]
     
   } else {
     

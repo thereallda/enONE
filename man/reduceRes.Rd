@@ -4,14 +4,14 @@
 \alias{reduceRes}
 \title{Combine list of DE results}
 \usage{
-reduceRes(res.ls, lfc.col, levels = names(res.ls))
+reduceRes(res.ls, logfc.col, levels = names(res.ls))
 }
 \arguments{
 \item{res.ls}{Named list of differential analysis results tables.
 Each elements in the list correspond to a table of differential analysis
 results between two groups of samples.}
 
-\item{lfc.col}{Column name of the log fold-change.}
+\item{logfc.col}{Column name of the log fold-change.}
 
 \item{levels}{Factor levels of the groups, default order by the element order of \code{res.ls}.}
 }

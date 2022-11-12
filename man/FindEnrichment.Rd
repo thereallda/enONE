@@ -29,7 +29,7 @@ between the two groups of samples, default: 1.}
 \item{...}{Additional parameters can be passed to \code{edgeRDE}.}
 }
 \value{
-data.frame
+updated Enone
 }
 \description{
 Find enriched genes between enrich and input samples
