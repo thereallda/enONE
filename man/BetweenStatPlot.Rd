@@ -11,6 +11,7 @@ BetweenStatPlot(
   color,
   palette = NULL,
   test = c("wilcox.test", "t.test", "none"),
+  add.p = c("p", "p.adj"),
   comparisons = NULL,
   step.increase = 0.3
 )
@@ -26,11 +27,13 @@ BetweenStatPlot(
 
 \item{palette}{The color palette for different groups.}
 
-\item{test}{Perform "wilcox.test" or "t.test" or no test.}
+\item{test}{Perform wilcoxon rank sum test or t-test or no test, must be one of c("wilcox.test", "t.test", "none").}
+
+\item{add.p}{Label p-value or adjusted p-value, must be one of c("p", "p.adj").}
 
 \item{comparisons}{A list of length-2 vectors specifying the groups of interest to be compared. For example to compare groups "A" vs "B" and "B" vs "C", the argument is as follow: comparisons = list(c("A", "B"), c("B", "C"))}
 
-\item{step.increase}{numeric vector with the increase in fraction of total height for every additional comparison to minimize overlap.}
+\item{step.increase}{Numeric vector with the increase in fraction of total height for every additional comparison to minimize overlap.}
 }
 \value{
 ggplot2 object

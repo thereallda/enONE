@@ -443,22 +443,20 @@ ggPCA_Biplot <- function(object, score, pt.label=TRUE, interactive=FALSE) {
 #' @param res.ls Named list of differential analysis results tables. 
 #' Each elements in the list correspond to a table of differential analysis 
 #' results between two groups of samples. 
-#' @param fc.col Name of the fold change column. The fold change column name 
-#' must be consistent with your results tables. 
+#' @param lfc.col Column name of the log fold-change. 
 #' @param levels Factor levels of the groups, default order by the element order of \code{res.ls}. 
 #'
 #' @return data.frame
 #' @export
 #'
 #' @import dplyr
-reduceRes <- function(res.ls, fc.col, levels=names(res.ls)) {
+reduceRes <- function(res.ls, lfc.col, levels=names(res.ls)) {
   df <- data.frame()
   for (id in names(res.ls)) {
     curr <- res.ls[[grep(id, names(res.ls), value=TRUE)]] 
-    # curr$GeneID <- rownames(curr)
     df1 <- curr %>% 
       dplyr::mutate(Group = factor(rep(id, nrow(curr)), levels = levels)) %>% 
-      dplyr::select(GeneID, !!sym(fc.col), Group)
+      dplyr::select(GeneID, !!sym(lfc.col), Group)
     df <- rbind(df, df1)
   }
   return(df)
@@ -471,46 +469,46 @@ reduceRes <- function(res.ls, fc.col, levels=names(res.ls)) {
 #' @param y The value variable from the \code{data}.
 #' @param color The color variable from the \code{data}.
 #' @param palette The color palette for different groups.
-#' @param test Perform "wilcox.test" or "t.test" or no test.
-#' @param step.increase numeric vector with the increase in fraction of total height for every additional comparison to minimize overlap.
+#' @param test Perform wilcoxon rank sum test or t-test or no test, must be one of c("wilcox.test", "t.test", "none").
+#' @param add.p Label p-value or adjusted p-value, must be one of c("p", "p.adj").
+#' @param step.increase Numeric vector with the increase in fraction of total height for every additional comparison to minimize overlap.
 #' @param comparisons	A list of length-2 vectors specifying the groups of interest to be compared. For example to compare groups "A" vs "B" and "B" vs "C", the argument is as follow: comparisons = list(c("A", "B"), c("B", "C"))
 #' @return ggplot2 object
 #' @export
 #'
 #' @import dplyr
 #' @import ggplot2
-#' @import rstatix
+#' @importFrom rstatix wilcox_test t_test adjust_pvalue p_format add_xy_position
 #' @importFrom paintingr paint_palette
 #' @importFrom ggpubr stat_pvalue_manual
 #' @importFrom stats as.formula
-#' @importFrom rlang .data
 BetweenStatPlot <- function(data, x, y, color, palette = NULL,
                             test = c("wilcox.test", "t.test", "none"),
+                            add.p = c("p", "p.adj"),
                             comparisons = NULL,
                             step.increase=0.3) {
-  stat.formula <- as.formula(paste(y, "~", x))
-  
+  stat.formula <- stats::as.formula(paste(y, "~", x))
+
   test <- match.arg(test, choices = c("wilcox.test", "t.test", "none"))
   if (test != "none") {
     if (test == "wilcox.test") {
-      stat_dat <- data %>%
-        wilcox_test(stat.formula, comparisons = comparisons)
+      stat_dat <- rstatix::wilcox_test(data, stat.formula, comparisons = comparisons)
     }
     if (test == "t.test") {
-      stat_dat <- data %>%
-        t_test(stat.formula, comparisons = comparisons)
+      stat_dat <- rstatix::t_test(data, stat.formula, comparisons = comparisons)
     }
+    add.p <- match.arg(add.p, choices = c("p", "p.adj"))
     stat_dat <- stat_dat %>%
-      adjust_pvalue() %>%
-      p_format(.data$p.adj, digits = 2, leading.zero = FALSE,
+      rstatix::adjust_pvalue() %>%
+      rstatix::p_format(!!dplyr::sym(add.p), digits = 2, leading.zero = FALSE,
                trailing.zero = TRUE, add.p = TRUE, accuracy = 2e-16) %>%
-      add_xy_position(x = x, dodge=0.8, step.increase=step.increase)
+      rstatix::add_xy_position(x = x, dodge=0.8, step.increase=step.increase)
   }
-  
-  x.labs <- paste0(unique(data[,x]), "\n(n=", tabulate(as.factor(data[,x])),")")
+  data[,x] <- as.factor(data[,x])
+  x.labs <- paste0(levels(data[,x]), "\n(n=", tabulate(data[,x]),")")
   x.num <- length(unique(data[,color])) # number of x types
-  if (is.null(palette)) palette <- paint_palette("Spring", x.num, "continuous")
-  
+  if (is.null(palette)) palette <- paintingr::paint_palette("Spring", x.num, "continuous")
+
   p <- data %>%
     ggplot(aes_string(x, y, color = color)) +
     geom_violin(width = 0.8) +
@@ -521,11 +519,11 @@ BetweenStatPlot <- function(data, x, y, color, palette = NULL,
     scale_color_manual(values = palette) +
     scale_x_discrete(labels = x.labs) +
     labs(x="")
-  
+
   if (exists("stat_dat")) {
-    p <- p + stat_pvalue_manual(data = stat_dat, label = "p.adj", tip.length = 0.01, size = 3)
+    p <- p + ggpubr::stat_pvalue_manual(data = stat_dat, label = add.p, tip.length = 0.01, size = 3)
   }
-  
+
   return(p)
 }
 
@@ -628,13 +626,14 @@ edgeRDE <- function(counts,
 #' 
 #' @import ggplot2
 #' @importFrom paintingr paint_palette
-ggDotPlot <- function(data, x, y, fill, palette = NULL) {
+ggDotPlot <- function(data, x, y, fill = NULL, palette = NULL) {
   
-  if (is.null(palette)) {
+  if (!is.null(fill) & is.null(palette)) {
     palette <- paintingr::paint_palette("Splash",length(unique(data[,fill])),"continuous")
   }
   
-  ggplot(data, aes_string(x, y, fill = fill)) +
+  if (!is.null(fill)) {
+    ggplot(data, aes_string(x, y, fill = fill)) +
     geom_dotplot(binaxis = "y", stackdir = "center", color = NA, 
                  dotsize = 0.8, position = "dodge") +
     stat_summary(fun.data = .mean_sd, size = 0.5, shape = 19, 
@@ -642,6 +641,16 @@ ggDotPlot <- function(data, x, y, fill, palette = NULL) {
     theme_minimal() +
     scale_fill_manual(values = palette) +
     labs(x="", y="Fold Change")
+  } else {
+    ggplot(data, aes_string(x, y)) +
+    geom_dotplot(binaxis = "y", stackdir = "center", color = NA, 
+                 dotsize = 0.8, position = "dodge") +
+    stat_summary(fun.data = .mean_sd, size = 0.5, shape = 19, 
+                 position = position_dodge(width=0.9), show.legend = FALSE) +
+    theme_minimal() +
+    labs(x="", y="Fold Change")
+  }
+
 }
 
 #' Statistics summary (mean and +/- sd)

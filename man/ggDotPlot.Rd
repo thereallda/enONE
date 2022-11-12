@@ -4,7 +4,7 @@
 \alias{ggDotPlot}
 \title{Dot-plot with mean_sd bar}
 \usage{
-ggDotPlot(data, x, y, fill, palette = NULL)
+ggDotPlot(data, x, y, fill = NULL, palette = NULL)
 }
 \arguments{
 \item{data}{A data.frame (or a tibble).}
