@@ -67,7 +67,7 @@ GeneSelection <- function(object,
   res_tab <- de.all$res.ls[[1]]
   neg.eval.set <- head(res_tab[order(res_tab$FDR, decreasing = TRUE),]$GeneID, n = n.neg.eval)
   
-  return(list("NegControl"=neg.control.set, 
-              "PosEvaluation"=pos.eval.set, 
-              "NegEvaluation"=neg.eval.set))
+  return(list("NegControl" = neg.control.set, 
+              "PosEvaluation" = pos.eval.set, 
+              "NegEvaluation" = neg.eval.set))
 }

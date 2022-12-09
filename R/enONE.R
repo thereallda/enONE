@@ -9,9 +9,9 @@
 #' @param neg.control Vector of negative control genes' id for RUV normalization, default: NULL. 
 #' @param pos.eval Vector of positive evaluation genes' id for wanted variation assessment, default: NULL.
 #' @param neg.eval Vector of negative evaluation genes' id for unwanted variation assessment, default: NULL.
-#' @param scaling.method Vector of normalization methods that are applied to the data.
+#' @param scaling.method Vector of scaling methods that are applied to the data.
 #'   Available methods are: \code{c("TC", "UQ", "TMM", "DESeq", "PossionSeq")}. 
-#'   Select one or multiple methods. By default all normalization methods will be applied.
+#'   Select one or multiple methods. By default all scaling methods will be applied.
 #' @param ruv.norm Whether to perform RUV normalization. 
 #' @param ruv.k The number of factors of unwanted variation to be estimated from the data.
 #' @param ruv.drop The number of singular values to drop in the estimation of 
@@ -22,10 +22,9 @@
 #'
 #' @return Enone object.
 #' @export
-#'
-#' @importFrom utils head
-#' @importFrom stringr str_extract
-#' @importFrom stats as.formula model.matrix setNames
+#' 
+#' @importFrom SummarizedExperiment rowData assay
+#' @importFrom stats setNames
 enONE <- function(object,
                   auto = TRUE, 
                   n.neg.control = 1000, n.pos.eval = 500, n.neg.eval = 500,
@@ -55,7 +54,9 @@ enONE <- function(object,
   
   # get counts
   data <- SummarizedExperiment::assay(object)
+  # sample counts
   counts_nsp <- data[grep(spike.in.prefix, rownames(data), invert = TRUE),]
+  # spike-in counts
   counts_sp <- data[grep(spike.in.prefix, rownames(data)),]
   
   ## gene selection 
@@ -102,7 +103,7 @@ enONE <- function(object,
                                 scaling.method = scaling.method, 
                                 ruv.norm = ruv.norm, ruv.k = ruv.k, ruv.drop = ruv.drop,
                                 spike.in.prefix = spike.in.prefix,
-                                # below parameters are generated inside function
+                                # below parameters are generated inside enONE function
                                 control.idx = neg.control.set, 
                                 sc.idx = sc_mat, 
                                 enrich.idx = enrich_mat)
@@ -130,7 +131,7 @@ enONE <- function(object,
   object@enone_metrics <- norm.eval$metrics
   ## save score to Enone object
   object@enone_score <- norm.eval$score
-  ## add run parameter in Enone object
+  ## add run parameter to Enone object
   parameter.run <- list(
     n.neg.control = n.neg.control,
     n.pos.eval = n.pos.eval,

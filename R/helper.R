@@ -5,7 +5,7 @@
 #' @param method Which normalization methods, must be one of the methods presented in the selected slot.  
 #' @param logfc.cutoff Filter genes by at least X-fold difference (log2-scale) 
 #' between the two groups of samples, default: 1. 
-#' @param p.cutoff Filter genes by no more than Y adjusted p-value, default: 0.05. 
+#' @param p.cutoff Filter genes by no more than \code{p.cutoff} adjusted p-value, default: 0.05. 
 #' @param ... Additional parameters can be passed to \code{edgeRDE}. 
 #' 
 #' @name FindEnrichment 
@@ -40,8 +40,8 @@ FindEnrichment <-  function(object, slot=c("sample","spike_in"), method,
   
   # get list of factors 
   factor.ls <- getFactor(object, slot=slot, method=method)
-  if ("normFactor" %in% names(factor.ls)) {
-    if ("adjustFactor" %in% names(factor.ls)) {
+  if ( !is.null(factor.ls[["normFactor"]]) ) {
+    if ( !is.null(factor.ls[["adjustFactor"]]) ) {
       # if norm factors and adjust factors were both provided
       de <- edgeRDE(counts = counts_df,
                     group = object$condition,
