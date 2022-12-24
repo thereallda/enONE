@@ -110,7 +110,7 @@ enONE <- function(object,
   
   ## assessment 
   bio_group_index <- as.numeric(factor(bio.group, levels=unique(bio.group)))
-  assay_group_index <- as.numeric(factor(enrich.group, levels=unique(enrich.group)))
+  enrich_group_index <- as.numeric(factor(enrich.group, levels=unique(enrich.group)))
   if (!is.null(batch.group)) {
     batch_group_index <- as.numeric(factor(batch.group, levels=unique(batch.group)))
   } else {
@@ -123,7 +123,7 @@ enONE <- function(object,
                                    batch.group = batch_group_index,
                                    # below parameters are created inside function
                                    bio.group = bio_group_index, 
-                                   assay.group = assay_group_index, 
+                                   enrich.group = enrich_group_index, 
                                    pos.eval.set = pos.eval.set,
                                    neg.eval.set = neg.eval.set)
   

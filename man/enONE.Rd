@@ -39,9 +39,9 @@ evaluation and negative evaluation genes, default: TRUE.}
 
 \item{neg.eval}{Vector of negative evaluation genes' id for unwanted variation assessment, default: NULL.}
 
-\item{scaling.method}{Vector of normalization methods that are applied to the data.
+\item{scaling.method}{Vector of scaling methods that are applied to the data.
 Available methods are: \code{c("TC", "UQ", "TMM", "DESeq", "PossionSeq")}.
-Select one or multiple methods. By default all normalization methods will be applied.}
+Select one or multiple methods. By default all scaling methods will be applied.}
 
 \item{ruv.norm}{Whether to perform RUV normalization.}
 

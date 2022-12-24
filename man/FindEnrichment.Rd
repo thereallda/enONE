@@ -24,7 +24,7 @@ FindEnrichment(
 \item{logfc.cutoff}{Filter genes by at least X-fold difference (log2-scale)
 between the two groups of samples, default: 1.}
 
-\item{p.cutoff}{Filter genes by no more than Y adjusted p-value, default: 0.05.}
+\item{p.cutoff}{Filter genes by no more than \code{p.cutoff} adjusted p-value, default: 0.05.}
 
 \item{...}{Additional parameters can be passed to \code{edgeRDE}.}
 }

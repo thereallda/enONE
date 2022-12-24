@@ -596,7 +596,7 @@ edgeRDE <- function(counts,
   
   res.ls <- lapply(lrt.ls, function(x) {
     res1 <- edgeR::topTags(x, n = Inf, adjust.method = "BH")
-    res.tab <- res1$table %>% tibble::rownames_to_column() %>% dplyr::rename(GeneID = rowname)
+    res.tab <- res1$table %>% tibble::rownames_to_column(var = "GeneID")
     return(res.tab)
     })
   

@@ -12,6 +12,7 @@
 #' @export
 #'
 #' @importFrom SummarizedExperiment assay
+#' @importFrom utils head
 #' @importFrom stats model.matrix as.formula
 GeneSelection <- function(object,
                           n.neg.control,

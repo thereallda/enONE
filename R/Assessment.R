@@ -4,7 +4,7 @@
 #'   adjusting unwanted variation. Output of \code{ApplyNormalization}. 
 #' @param bio.group Vector of index indicating the column index of samples of 
 #'   each biological groups in the raw/normalized count data matrix. 
-#' @param assay.group Vector of index indicating the column index of 
+#' @param enrich.group Vector of index indicating the column index of 
 #'   enrichment and input samples in the raw/normalized count data matrix. 
 #' @param batch.group Vector of index indicating the column index of 
 #'   each batch groups in the raw/normalized count data matrix. 
@@ -27,7 +27,7 @@
 #' @importFrom fpc pamk
 AssessNormalization <- function(data.ls, 
                                 bio.group = NULL, 
-                                assay.group = NULL, 
+                                enrich.group = NULL, 
                                 batch.group = NULL,
                                 pam.krange = 2:6, 
                                 pc.k = 3, 
@@ -59,10 +59,10 @@ AssessNormalization <- function(data.ls,
     } else {
       bio_sil <- 0
     }
-    if (length(assay.group) == ncol(data)) {
-      assay_sil <- mean(cluster::silhouette(assay.group, dist.pca.expr)[,"sil_width"])
+    if (length(enrich.group) == ncol(data)) {
+      en_sil <- mean(cluster::silhouette(enrich.group, dist.pca.expr)[,"sil_width"])
     } else {
-      assay_sil <- 0
+      en_sil <- 0
     }
     if (length(batch.group) == ncol(data)) {
       batch_sil <- mean(cluster::silhouette(batch.group, dist.pca.expr)[,"sil_width"])
@@ -106,14 +106,14 @@ AssessNormalization <- function(data.ls,
     }
   
     metrics <- c(
-      BIO_SIL = bio_sil,
-      ASSAY_SIL = assay_sil,
-      BATCH_SIL = batch_sil,
-      PAM_SIL = pam_sil,
+      BIO_SIM = bio_sil,
+      EN_SIM = en_sil,
+      BATCH_SIM = batch_sil,
+      PAM_SIM = pam_sil,
       RLE_MED = rle_med,
       RLE_IQR = rle_iqr,
-      EXP_WV_COR = wv_cor,
-      EXP_UV_COR = uv_cor
+      WV_COR = wv_cor,
+      UV_COR = uv_cor
       )
   })
   
@@ -122,7 +122,7 @@ AssessNormalization <- function(data.ls,
   metrics <- data.frame(do.call(rbind, metrics.ls))
   
   # multiplying by +/- 1 so that large values correspond to good performance
-  score <- t(t(metrics) * c(1,1,-1,1,-1,-1,1,-1))  # BIO_SIL,ASSAY_SIL,BATCH_SIL,PAM_SIL,RLE_MED,RLE_IQR,EXP_WV_COR,EXP_UV_COR
+  score <- t(t(metrics) * c(1,1,-1,1,-1,-1,1,-1))  # BIO_SIM,EN_SIM,BATCH_SIM,PAM_SIM,RLE_MED,RLE_IQR,WV_COR,UV_COR
   # rank score
   ranked_score <- apply(na.omit(score), 2, rank, ties.method = "min")
   # mean score rank

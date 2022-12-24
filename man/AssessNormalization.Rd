@@ -7,7 +7,7 @@
 AssessNormalization(
   data.ls,
   bio.group = NULL,
-  assay.group = NULL,
+  enrich.group = NULL,
   batch.group = NULL,
   pam.krange = 2:6,
   pc.k = 3,
@@ -23,7 +23,7 @@ adjusting unwanted variation. Output of \code{ApplyNormalization}.}
 \item{bio.group}{Vector of index indicating the column index of samples of
 each biological groups in the raw/normalized count data matrix.}
 
-\item{assay.group}{Vector of index indicating the column index of
+\item{enrich.group}{Vector of index indicating the column index of
 enrichment and input samples in the raw/normalized count data matrix.}
 
 \item{batch.group}{Vector of index indicating the column index of
