@@ -71,6 +71,12 @@ ApplyNormalization <- function(data,
 
   # RUV normalization
   if (ruv.norm) {
+    
+    # stop when provided ruv.k larger than sample size
+    if (ruv.k > ncol(data)) {
+      stop("Number of `ruv.k` must not exceed the number of samples.")
+    }
+    
     ruv.ls <- list()
     for (i in names(data.norm)) {
       data.curr <- data.norm[[i]]$dataNorm

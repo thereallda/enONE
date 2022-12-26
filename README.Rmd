@@ -160,13 +160,13 @@ If batch not provided, preclude `BATCH_SIL` column and `SCORE` column.
 ```{r, fig.width=10, fig.height=10}
 enScore <- getScore(Enone)
 pca.eval <- prcomp(enScore[,-c(3, 9)], scale = TRUE)
-ggPCA_Biplot(pca.eval, score = enScore$SCORE)
+PCA_Biplot(pca.eval, score = enScore$SCORE)
 ```
 
 You can turn on the interactive mode to further explore the performance of each method. 
 
 ```{r,warning=FALSE,eval=FALSE}
-ggPCA_Biplot(pca.eval, score = Enone@enone_score$SCORE, interactive = TRUE)
+PCA_Biplot(pca.eval, score = Enone@enone_score$SCORE, interactive = TRUE)
 ```
 
 ### Use suitable normalization 
@@ -186,10 +186,10 @@ we use PCA to visualize the counts from samples before and after the normalizati
 
 ```{r,fig.width=12, fig.height=6}
 samples_name <- paste(Enone$condition, Enone$replicate, sep='.')
-p1 <- ggPCA(log1p(Counts(Enone, slot='sample', 'Raw')), 
+p1 <- PCAplot(log1p(Counts(Enone, slot='sample', 'Raw')), 
             color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('Before normalization')
-p2 <- ggPCA(log1p(norm.data), 
+p2 <- PCAplot(log1p(norm.data), 
             color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('After normalization')
 p1 + p2
@@ -305,6 +305,6 @@ syn_df <- as.data.frame(syn_level) %>%
 # remove suffix of condition
 syn_df$condition <- gsub("\\..*", "", syn_df$condition)
 
-ggDotPlot(syn_df, x="condition", y="logFC", fill="condition") +
+DotPlot(syn_df, x="condition", y="logFC", fill="condition") +
   facet_wrap(~syn_id)
 ```

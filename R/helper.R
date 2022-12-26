@@ -250,6 +250,91 @@ synEnrichment <- function(object, method="TC", log=TRUE) {
   return(syn_en)
 }
 
+#' Wrapper of edgeR procedure
+#'
+#' @param counts A un-normalized counts data matrix. 
+#' @param group Vector of length p mapping the columns of \code{counts} to 
+#'   corresponding samples group. 
+#' @param norm.factors Vector of normalization factors with p length. 
+#' @param adjust.factors Matrix with each column indicates the adjusting factors 
+#'   that estimated from RUV. 
+#' @param design.formula Formula
+#' @param contrast.df Data frame of contrast, where extracting results as 
+#'   first column vs. second column. 
+#' @param coef Integer or character vector indicating which coefficients of the 
+#'   linear model are to be tested equal to zero. Values must be columns or column names of design. 
+#' @param logfc.cutoff Filter genes by at least X-fold difference (log2-scale) 
+#'   between the two groups of samples, default: 1. 
+#' @param p.cutoff Filter genes by no more than Y adjusted p-value, default: 0.05. 
+#' @param only.pos Only return positive genes in filtered results \code{res.sig.ls}, default: TRUE.
+#' 
+#' @return List containing differential analysis object, result table and filtered result table.  
+#' @export
+#'
+#' @import edgeR
+#' @import dplyr
+#' @importFrom stats model.matrix
+#' @importFrom limma makeContrasts
+#' @importFrom rlang .data
+#' @importFrom tibble rownames_to_column
+edgeRDE <- function(counts, 
+                    group,  
+                    norm.factors = NULL, 
+                    adjust.factors = NULL, 
+                    design.formula = NULL, 
+                    contrast.df = NULL,
+                    coef = NULL,
+                    logfc.cutoff = 1, p.cutoff = 0.05, only.pos = TRUE) {
+  
+  degs <- edgeR::DGEList(counts, group = group)
+  
+  if (is.null(norm.factors)) {
+    degs <- edgeR::calcNormFactors(degs, method = "RLE") # Default: perform RLE normalization
+  } else {
+    degs$samples$norm.factors <- norm.factors
+  }
+  
+  if (is.null(adjust.factors)) {
+    design.df <- data.frame(condition = group, row.names = colnames(counts))
+    design.mat <- stats::model.matrix(design.formula, data = design.df)
+  } else {
+    design.df <- data.frame(condition = group, adjust.factors, row.names = colnames(counts))
+    design.mat <- stats::model.matrix(as.formula(paste("~0+", paste(colnames(design.df), collapse = "+"))), data = design.df)
+  }
+  
+  degs <- edgeR::estimateDisp(degs, design = design.mat)
+  fit.glm <- edgeR::glmFit(degs, design = design.mat)
+  
+  # extract DE results
+  if (is.null(coef) & !is.null(contrast.df)) {
+    contrast.vec <- apply(contrast.df, 1, function(x) { paste(paste0("condition",x), collapse="-") })
+    contrast.mat <- limma::makeContrasts(contrasts = contrast.vec, levels = design.mat)
+    lrt.ls <- apply(contrast.mat, 2, function(x) { edgeR::glmLRT(fit.glm, contrast = x) })  
+    names(lrt.ls) <- gsub("-","_",gsub("condition","",contrast.vec))
+  } 
+  if (!is.null(coef) & is.null(contrast.df)) { 
+    lrt.ls <- list(edgeR::glmLRT(fit.glm, coef = coef)) 
+    # names(lrt.ls) <- gsub("condition","",paste(colnames(design.mat)[coef], collapse = "_"))
+  }
+  
+  res.ls <- lapply(lrt.ls, function(x) {
+    res1 <- edgeR::topTags(x, n = Inf, adjust.method = "BH")
+    res.tab <- res1$table %>% tibble::rownames_to_column(var = "GeneID")
+    return(res.tab)
+  })
+  
+  # names(res.ls) <- gsub("condition", "", contrast.vec)
+  # significant DEGs
+  if (only.pos) {
+    # return only positive regulated genes
+    res.sig.ls <- lapply(res.ls, function(x) { x[x$logFC >= logfc.cutoff & x$FDR < p.cutoff,] })
+  } else {
+    # return both positive and negative regulated genes
+    res.sig.ls <- lapply(res.ls, function(x) { x[abs(x$logFC) >= logfc.cutoff & x$FDR < p.cutoff,] })
+  }
+  
+  return(list(de.obj = degs, res.ls = res.ls, res.sig.ls = res.sig.ls))
+}
 
 #' Create a matrix for RUVSeq
 #'
@@ -290,8 +375,36 @@ countReplicate <- function(group.vec) {
   rep.vec
 }
 
-#' PCA plot from counts matrix
+#' Combine list of DE results
 #'
+#' @param res.ls Named list of differential analysis results tables. 
+#' Each elements in the list correspond to a table of differential analysis 
+#' results between two groups of samples. 
+#' @param logfc.col Column name of the log fold-change. 
+#' @param levels Factor levels of the groups, default order by the element order of \code{res.ls}. 
+#'
+#' @return data.frame
+#' @export
+#'
+#' @import dplyr
+reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
+  df <- data.frame()
+  for (id in names(res.ls)) {
+    curr <- res.ls[[grep(id, names(res.ls), value=TRUE)]] 
+    df1 <- curr %>% 
+      dplyr::mutate(Group = factor(rep(id, nrow(curr)), levels = levels)) %>% 
+      dplyr::select(GeneID, !!sym(logfc.col), Group)
+    df <- rbind(df, df1)
+  }
+  return(df)
+}
+
+##--Visualization--##
+
+#' PCA plot from counts matrix
+#' 
+#' @details Perform PCA based on matrix using \code{prcomp}, and visualized with scatter plot.
+#' 
 #' @param object A count matrix.
 #' @param use.pc Which two PCs to be used, default PC1 in x-axis and PC2 in y-axis.
 #' @param color Vector indicates the color mapping of samples, default NULL.
@@ -310,7 +423,7 @@ countReplicate <- function(group.vec) {
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom stats prcomp
 #' @importFrom paintingr paint_palette
-ggPCA <- function(object, use.pc=c(1,2),
+PCAplot <- function(object, use.pc=c(1,2),
                   color=NULL, label=NULL, shape=NULL,
                   vst.norm=FALSE, palette=NULL, repel=TRUE) {
   if (vst.norm) {
@@ -392,7 +505,7 @@ ggPCA <- function(object, use.pc=c(1,2),
 #' @importFrom paintingr paint_palette
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom plotly ggplotly
-ggPCA_Biplot <- function(object, score, pt.label=TRUE, interactive=FALSE) {
+PCA_Biplot <- function(object, score, pt.label=TRUE, interactive=FALSE) {
   
   # get data matrix 
   X <- object$x %*% solve(object$rotation)
@@ -436,30 +549,6 @@ ggPCA_Biplot <- function(object, score, pt.label=TRUE, interactive=FALSE) {
   }
   
   return(p)
-}
-
-#' Combine list of DE results
-#'
-#' @param res.ls Named list of differential analysis results tables. 
-#' Each elements in the list correspond to a table of differential analysis 
-#' results between two groups of samples. 
-#' @param logfc.col Column name of the log fold-change. 
-#' @param levels Factor levels of the groups, default order by the element order of \code{res.ls}. 
-#'
-#' @return data.frame
-#' @export
-#'
-#' @import dplyr
-reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
-  df <- data.frame()
-  for (id in names(res.ls)) {
-    curr <- res.ls[[grep(id, names(res.ls), value=TRUE)]] 
-    df1 <- curr %>% 
-      dplyr::mutate(Group = factor(rep(id, nrow(curr)), levels = levels)) %>% 
-      dplyr::select(GeneID, !!sym(logfc.col), Group)
-    df <- rbind(df, df1)
-  }
-  return(df)
 }
 
 #' Box-violin plot comparing values between groups
@@ -527,92 +616,6 @@ BetweenStatPlot <- function(data, x, y, color, palette = NULL,
   return(p)
 }
 
-#' Wrapper of edgeR procedure
-#'
-#' @param counts A un-normalized counts data matrix. 
-#' @param group Vector of length p mapping the columns of \code{counts} to 
-#'   corresponding samples group. 
-#' @param norm.factors Vector of normalization factors with p length. 
-#' @param adjust.factors Matrix with each column indicates the adjusting factors 
-#'   that estimated from RUV. 
-#' @param design.formula Formula
-#' @param contrast.df Data frame of contrast, where extracting results as 
-#'   first column vs. second column. 
-#' @param coef Integer or character vector indicating which coefficients of the 
-#'   linear model are to be tested equal to zero. Values must be columns or column names of design. 
-#' @param logfc.cutoff Filter genes by at least X-fold difference (log2-scale) 
-#'   between the two groups of samples, default: 1. 
-#' @param p.cutoff Filter genes by no more than Y adjusted p-value, default: 0.05. 
-#' @param only.pos Only return positive genes in filtered results \code{res.sig.ls}, default: TRUE.
-#' 
-#' @return List containing differential analysis object, result table and filtered result table.  
-#' @export
-#'
-#' @import edgeR
-#' @import dplyr
-#' @importFrom stats model.matrix
-#' @importFrom limma makeContrasts
-#' @importFrom rlang .data
-#' @importFrom tibble rownames_to_column
-edgeRDE <- function(counts, 
-                    group,  
-                    norm.factors = NULL, 
-                    adjust.factors = NULL, 
-                    design.formula = NULL, 
-                    contrast.df = NULL,
-                    coef = NULL,
-                    logfc.cutoff = 1, p.cutoff = 0.05, only.pos = TRUE) {
-  
-  degs <- edgeR::DGEList(counts, group = group)
-  
-  if (is.null(norm.factors)) {
-    degs <- edgeR::calcNormFactors(degs, method = "RLE") # Default: perform RLE normalization
-  } else {
-    degs$samples$norm.factors <- norm.factors
-  }
-  
-  if (is.null(adjust.factors)) {
-    design.df <- data.frame(condition = group, row.names = colnames(counts))
-    design.mat <- stats::model.matrix(design.formula, data = design.df)
-  } else {
-    design.df <- data.frame(condition = group, adjust.factors, row.names = colnames(counts))
-    design.mat <- stats::model.matrix(as.formula(paste("~0+", paste(colnames(design.df), collapse = "+"))), data = design.df)
-  }
-  
-  degs <- edgeR::estimateDisp(degs, design = design.mat)
-  fit.glm <- edgeR::glmFit(degs, design = design.mat)
-  
-  # extract DE results
-  if (is.null(coef) & !is.null(contrast.df)) {
-    contrast.vec <- apply(contrast.df, 1, function(x) { paste(paste0("condition",x), collapse="-") })
-    contrast.mat <- limma::makeContrasts(contrasts = contrast.vec, levels = design.mat)
-    lrt.ls <- apply(contrast.mat, 2, function(x) { edgeR::glmLRT(fit.glm, contrast = x) })  
-    names(lrt.ls) <- gsub("-","_",gsub("condition","",contrast.vec))
-  } 
-  if (!is.null(coef) & is.null(contrast.df)) { 
-    lrt.ls <- list(edgeR::glmLRT(fit.glm, coef = coef)) 
-    # names(lrt.ls) <- gsub("condition","",paste(colnames(design.mat)[coef], collapse = "_"))
-  }
-  
-  res.ls <- lapply(lrt.ls, function(x) {
-    res1 <- edgeR::topTags(x, n = Inf, adjust.method = "BH")
-    res.tab <- res1$table %>% tibble::rownames_to_column(var = "GeneID")
-    return(res.tab)
-    })
-  
-  # names(res.ls) <- gsub("condition", "", contrast.vec)
-  # significant DEGs
-  if (only.pos) {
-    # return only positive regulated genes
-    res.sig.ls <- lapply(res.ls, function(x) { x[x$logFC >= logfc.cutoff & x$FDR < p.cutoff,] })
-  } else {
-    # return both positive and negative regulated genes
-    res.sig.ls <- lapply(res.ls, function(x) { x[abs(x$logFC) >= logfc.cutoff & x$FDR < p.cutoff,] })
-  }
-  
-  return(list(de.obj = degs, res.ls = res.ls, res.sig.ls = res.sig.ls))
-}
-
 #' Dot-plot with mean_sd bar
 #'
 #' @param data A data.frame (or a tibble).
@@ -626,7 +629,7 @@ edgeRDE <- function(counts,
 #' 
 #' @import ggplot2
 #' @importFrom paintingr paint_palette
-ggDotPlot <- function(data, x, y, fill = NULL, palette = NULL) {
+DotPlot <- function(data, x, y, fill = NULL, palette = NULL) {
   
   if (!is.null(fill) & is.null(palette)) {
     palette <- paintingr::paint_palette("Splash",length(unique(data[[fill]])),"continuous")

@@ -188,7 +188,8 @@ Normalization and assessment can be achieved by wrapper function `enONE`
 ``` r
 Enone <- enONE(Enone, 
                ruv.norm = TRUE, ruv.k = 3,
-               pam.krange = 2:6, pc.k = 3
+               eval.pam.k = 2:6, eval.pc.n = 3,
+               return.norm = FALSE,
                )
 #> Gene set selection for normalization and assessment...
 #> - The number of negative control genes for normalization: 1000 
@@ -200,15 +201,15 @@ Enone <- enONE(Enone,
 
 Selected gene sets are stored in `rowData`, including:
 
--   `NegControl`: Boolean value indicate whether this gene is a member
-    of the negative control gene sets for RUV, default the most 1000 not
-    enriched genes in spike_in are selected.
--   `NegEvaluation`: Boolean value indicate whether this gene is a
-    member of the negative evaluation gene set, default the most 500 not
-    variable genes in samples are selected.
--   `PosEvaluation`: Boolean value indicate whether this gene is a
-    member of the positive evaluation gene set, default the most 500
-    enriched genes in samples are selected.
+- `NegControl`: Boolean value indicate whether this gene is a member of
+  the negative control gene sets for RUV, default the most 1000 not
+  enriched genes in spike_in are selected.
+- `NegEvaluation`: Boolean value indicate whether this gene is a member
+  of the negative evaluation gene set, default the most 500 not variable
+  genes in samples are selected.
+- `PosEvaluation`: Boolean value indicate whether this gene is a member
+  of the positive evaluation gene set, default the most 500 enriched
+  genes in samples are selected.
 
 ``` r
 rowData(Enone)
@@ -298,20 +299,20 @@ order).
 
 ``` r
 head(getMetrics(Enone))
-#>                        BIO_SIL ASSAY_SIL BATCH_SIL   PAM_SIL      RLE_MED
+#>                        BIO_SIM    EN_SIM BATCH_SIM   PAM_SIM      RLE_MED
 #> TMM_RUVse_k3       0.004010675 0.3672915         0 0.7215727 0.0012331000
 #> TMM_RUVs_k3        0.264969797 0.3526664         0 0.6917263 0.0013922471
 #> TMM_RUVs_k2        0.273545725 0.3529028         0 0.6912465 0.0014106631
 #> PossionSeq_RUVs_k2 0.162922204 0.3557378         0 0.6791057 0.0001844717
 #> TMM_RUVs_k1        0.323222896 0.3572111         0 0.6832383 0.0017360384
 #> DESeq_RUVs_k3      0.329558547 0.3506919         0 0.6919255 0.0022146643
-#>                       RLE_IQR EXP_WV_COR EXP_UV_COR
-#> TMM_RUVse_k3       0.02174805  0.8464516  0.3908795
-#> TMM_RUVs_k3        0.02437620  0.6853092  0.1459999
-#> TMM_RUVs_k2        0.02708899  0.7287250  0.1508830
-#> PossionSeq_RUVs_k2 0.07336386  0.9182946  0.2784424
-#> TMM_RUVs_k1        0.03318628  0.8619031  0.2170877
-#> DESeq_RUVs_k3      0.02595740  0.7217122  0.1135383
+#>                       RLE_IQR    WV_COR    UV_COR
+#> TMM_RUVse_k3       0.02174805 0.8464516 0.3908795
+#> TMM_RUVs_k3        0.02437620 0.6853092 0.1459999
+#> TMM_RUVs_k2        0.02708899 0.7287250 0.1508830
+#> PossionSeq_RUVs_k2 0.07336386 0.9182946 0.2784424
+#> TMM_RUVs_k1        0.03318628 0.8619031 0.2170877
+#> DESeq_RUVs_k3      0.02595740 0.7217122 0.1135383
 ```
 
 Check the performance of normalizations (ranked by scores in decreasing
@@ -319,20 +320,20 @@ order). Higher score means better performance.
 
 ``` r
 head(getScore(Enone))
-#>                    BIO_SIL ASSAY_SIL BATCH_SIL PAM_SIL RLE_MED RLE_IQR
-#> TMM_RUVse_k3            29        54         1      48      47      45
-#> TMM_RUVs_k3             50        36         1      36      46      37
-#> TMM_RUVs_k2             52        37         1      35      45      31
-#> PossionSeq_RUVs_k2      43        43         1      17      59       7
-#> TMM_RUVs_k1             55        47         1      25      39      22
-#> DESeq_RUVs_k3           56        32         1      37      34      35
-#>                    EXP_WV_COR EXP_UV_COR    SCORE
-#> TMM_RUVse_k3               15         29 38.14286
-#> TMM_RUVs_k3                 3         58 38.00000
-#> TMM_RUVs_k2                 8         57 37.85714
-#> PossionSeq_RUVs_k2         43         50 37.42857
-#> TMM_RUVs_k1                19         53 37.14286
-#> DESeq_RUVs_k3               6         60 37.14286
+#>                    BIO_SIM EN_SIM BATCH_SIM PAM_SIM RLE_MED RLE_IQR WV_COR
+#> TMM_RUVse_k3            29     54         1      48      47      45     15
+#> TMM_RUVs_k3             50     36         1      36      46      37      3
+#> TMM_RUVs_k2             52     37         1      35      45      31      8
+#> PossionSeq_RUVs_k2      43     43         1      17      59       7     43
+#> TMM_RUVs_k1             55     47         1      25      39      22     19
+#> DESeq_RUVs_k3           56     32         1      37      34      35      6
+#>                    UV_COR    SCORE
+#> TMM_RUVse_k3           29 38.14286
+#> TMM_RUVs_k3            58 38.00000
+#> TMM_RUVs_k2            57 37.85714
+#> PossionSeq_RUVs_k2     50 37.42857
+#> TMM_RUVs_k1            53 37.14286
+#> DESeq_RUVs_k3          60 37.14286
 ```
 
 #### PCA biplot
@@ -342,7 +343,7 @@ If batch not provided, preclude `BATCH_SIL` column and `SCORE` column.
 ``` r
 enScore <- getScore(Enone)
 pca.eval <- prcomp(enScore[,-c(3, 9)], scale = TRUE)
-ggPCA_Biplot(pca.eval, score = enScore$SCORE)
+PCA_Biplot(pca.eval, score = enScore$SCORE)
 ```
 
 <img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
@@ -351,7 +352,7 @@ You can turn on the interactive mode to further explore the performance
 of each method.
 
 ``` r
-ggPCA_Biplot(pca.eval, score = Enone@enone_score$SCORE, interactive = TRUE)
+PCA_Biplot(pca.eval, score = Enone@enone_score$SCORE, interactive = TRUE)
 ```
 
 ### Use suitable normalization
@@ -373,10 +374,10 @@ normalization.
 
 ``` r
 samples_name <- paste(Enone$condition, Enone$replicate, sep='.')
-p1 <- ggPCA(log1p(Counts(Enone, slot='sample', 'Raw')), 
+p1 <- PCAplot(log1p(Counts(Enone, slot='sample', 'Raw')), 
             color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('Before normalization')
-p2 <- ggPCA(log1p(norm.data), 
+p2 <- PCAplot(log1p(norm.data), 
             color = Enone$condition,
             label = samples_name, vst.norm = FALSE) + ggtitle('After normalization')
 p1 + p2
@@ -410,16 +411,16 @@ Each enrichment table is a `data.frame` with a list of genes as rows,
 and associated information as columns (GeneID, logFC, p-values, etc.).
 The following columns are present in the table:
 
--   `GeneID`: ID of genes.
--   `logFC`: log2 fold-change between enrichment and input samples.
-    Positive values indicate that the gene is more highly enriched in
-    the enrichment group.
--   `logCPM`: log2 CPM (counts per million) of the average expression of
-    all samples.
--   `LR`: Likelihood ratio of the likelihood ratio test.
--   `PValue`: p-value from the likelihood ratio test.
--   `FDR`: False discovery rate of the p-value, default “BH” method is
-    applied.
+- `GeneID`: ID of genes.
+- `logFC`: log2 fold-change between enrichment and input samples.
+  Positive values indicate that the gene is more highly enriched in the
+  enrichment group.
+- `logCPM`: log2 CPM (counts per million) of the average expression of
+  all samples.
+- `LR`: Likelihood ratio of the likelihood ratio test.
+- `PValue`: p-value from the likelihood ratio test.
+- `FDR`: False discovery rate of the p-value, default “BH” method is
+  applied.
 
 ``` r
 head(res.sig.ls[[1]])
@@ -545,7 +546,7 @@ syn_df <- as.data.frame(syn_level) %>%
 # remove suffix of condition
 syn_df$condition <- gsub("\\..*", "", syn_df$condition)
 
-ggDotPlot(syn_df, x="condition", y="logFC", fill="condition") +
+DotPlot(syn_df, x="condition", y="logFC", fill="condition") +
   facet_wrap(~syn_id)
 #> Bin width defaults to 1/30 of the range of the data. Pick better value with `binwidth`.
 ```
