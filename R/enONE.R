@@ -3,6 +3,8 @@
 #' @param object Enone object.
 #' @param auto Whether to automatically select negative control, positive 
 #'   evaluation and negative evaluation genes, default: TRUE. 
+#' @param return.norm Whether to return normalized counts in object. By default,
+#'   not return normalized counts for reducing memory costs. 
 #' @param n.neg.control Number of negative control genes for RUV normalization, default: 1000. 
 #' @param n.pos.eval Number of positive evaluation genes for wanted variation assessment, default: 500.
 #' @param n.neg.eval Number of negative evaluation genes for unwanted variation assessment, default: 500.
@@ -13,12 +15,13 @@
 #'   Available methods are: \code{c("TC", "UQ", "TMM", "DESeq", "PossionSeq")}. 
 #'   Select one or multiple methods. By default all scaling methods will be applied.
 #' @param ruv.norm Whether to perform RUV normalization. 
-#' @param ruv.k The number of factors of unwanted variation to be estimated from the data.
+#' @param ruv.k The number of factors of unwanted variation to be estimated from the data, default: 1.
 #' @param ruv.drop The number of singular values to drop in the estimation of 
 #'   unwanted variation, default: 0.  
-#' @param pam.krange Integer or vector of integers indicates the number of 
-#'   clusters for PAM clustering, default: 2:6. 
-#' @param pc.k Integer indicates the metrics will be calculated in the first kth PCs, default: 3.
+#' @param eval.pam.k Integer or vector of integers indicates the number of 
+#'   clusters for PAM clustering in performance evaluation, default: 2:6. 
+#' @param eval.pc.n Integer indicates the evaluation metrics will be calculated 
+#'   in the first nth PCs, default: 3.
 #'
 #' @return Enone object.
 #' @export
@@ -26,12 +29,12 @@
 #' @importFrom SummarizedExperiment rowData assay
 #' @importFrom stats setNames
 enONE <- function(object,
-                  auto = TRUE, 
+                  auto = TRUE, return.norm = FALSE,
                   n.neg.control = 1000, n.pos.eval = 500, n.neg.eval = 500,
                   neg.control = NULL, pos.eval = NULL, neg.eval = NULL,
                   scaling.method = c("TC", "UQ", "TMM", "DESeq", "PossionSeq"),
                   ruv.norm = TRUE, ruv.k = 1, ruv.drop = 0,
-                  pam.krange = 2:6, pc.k = 3) {
+                  eval.pam.k = 2:6, eval.pc.n = 3) {
   
   # retrieve parameters from Enone object
   bio.group <- object$condition
@@ -118,8 +121,8 @@ enONE <- function(object,
   }
   cat("Perform assessment...\n")
   norm.eval <- AssessNormalization(norm.ls,
-                                   pam.krange = pam.krange,
-                                   pc.k = pc.k,
+                                   eval.pam.k = eval.pam.k,
+                                   eval.pc.n = eval.pc.n,
                                    batch.group = batch_group_index,
                                    # below parameters are created inside function
                                    bio.group = bio_group_index, 
@@ -140,18 +143,25 @@ enONE <- function(object,
     ruv.norm = ruv.norm,
     ruv.k = ruv.k,
     ruv.drop = ruv.drop,
-    pam.krange = pam.krange,
-    pc.k = pc.k
+    eval.pam.k = eval.pam.k,
+    eval.pc.n = eval.pc.n,
+    auto = auto,
+    return.norm = return.norm
   )
   object@parameter <- c(object@parameter, parameter.run)
   
-  # only store normalization method names in object for reducing memory cost
+  # store normalization method names in object
   norm.methods <- names(norm.ls)
   object@counts$sample <- stats::setNames(vector("list", length(norm.methods)), nm = norm.methods)
   object@enone_factor$sample <- stats::setNames(vector("list", length(norm.methods)), nm = norm.methods)
-  # except 'Raw' matrix
+  
+  # store 'Raw' count matrix
   Counts(object, slot = "sample", method = "Raw") <- counts_nsp
   Counts(object, slot = "spike_in", method = "Raw") <- counts_sp
+  
+  if (return.norm == TRUE) {
+    object@counts$sample <- norm.ls
+  } 
   
   return(object)
 }

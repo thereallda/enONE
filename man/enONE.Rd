@@ -7,6 +7,7 @@
 enONE(
   object,
   auto = TRUE,
+  return.norm = FALSE,
   n.neg.control = 1000,
   n.pos.eval = 500,
   n.neg.eval = 500,
@@ -17,8 +18,8 @@ enONE(
   ruv.norm = TRUE,
   ruv.k = 1,
   ruv.drop = 0,
-  pam.krange = 2:6,
-  pc.k = 3
+  eval.pam.k = 2:6,
+  eval.pc.n = 3
 )
 }
 \arguments{
@@ -26,6 +27,9 @@ enONE(
 
 \item{auto}{Whether to automatically select negative control, positive
 evaluation and negative evaluation genes, default: TRUE.}
+
+\item{return.norm}{Whether to return normalized counts in object. By default,
+not return normalized counts for reducing memory costs.}
 
 \item{n.neg.control}{Number of negative control genes for RUV normalization, default: 1000.}
 
@@ -45,15 +49,16 @@ Select one or multiple methods. By default all scaling methods will be applied.}
 
 \item{ruv.norm}{Whether to perform RUV normalization.}
 
-\item{ruv.k}{The number of factors of unwanted variation to be estimated from the data.}
+\item{ruv.k}{The number of factors of unwanted variation to be estimated from the data, default: 1.}
 
 \item{ruv.drop}{The number of singular values to drop in the estimation of
 unwanted variation, default: 0.}
 
-\item{pam.krange}{Integer or vector of integers indicates the number of
-clusters for PAM clustering, default: 2:6.}
+\item{eval.pam.k}{Integer or vector of integers indicates the number of
+clusters for PAM clustering in performance evaluation, default: 2:6.}
 
-\item{pc.k}{Integer indicates the metrics will be calculated in the first kth PCs, default: 3.}
+\item{eval.pc.n}{Integer indicates the evaluation metrics will be calculated
+in the first nth PCs, default: 3.}
 }
 \value{
 Enone object.

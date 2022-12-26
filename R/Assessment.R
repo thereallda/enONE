@@ -8,10 +8,10 @@
 #'   enrichment and input samples in the raw/normalized count data matrix. 
 #' @param batch.group Vector of index indicating the column index of 
 #'   each batch groups in the raw/normalized count data matrix. 
-#' @param pam.krange Integer or vector of integers indicates the number of 
-#'   clusters for PAM clustering, default: 2:6. 
-#' @param pc.k Integer indicates the metrics will be calculated in the first kth 
-#'   PCs, default: 3.
+#' @param eval.pam.k Integer or vector of integers indicates the number of 
+#'   clusters for PAM clustering in performance evaluation, default: 2:6. 
+#' @param eval.pc.n Integer indicates the evaluation metrics will be calculated 
+#'   in the first nth PCs, default: 3.
 #' @param log Whether to perform log2-transformation with 1 offset on data matrix, 
 #'   default: TRUE. 
 #' @param pos.eval.set Vector of genes id.
@@ -29,8 +29,8 @@ AssessNormalization <- function(data.ls,
                                 bio.group = NULL, 
                                 enrich.group = NULL, 
                                 batch.group = NULL,
-                                pam.krange = 2:6, 
-                                pc.k = 3, 
+                                eval.pam.k = 2:6, 
+                                eval.pc.n = 3, 
                                 log = TRUE, 
                                 pos.eval.set = NULL, 
                                 neg.eval.set = NULL) {
@@ -49,9 +49,9 @@ AssessNormalization <- function(data.ls,
     pca.expr <- prcomp(scale(t(data.log)))
     # compute right singular value by svd
     expr_sv <- svd(scale(t(data.log), center = TRUE, scale = TRUE),
-                   nu = pc.k, nv = 0)$u
+                   nu = eval.pc.n, nv = 0)$u
     # calculate euclidean distance in the space of first k PCs (default: 3)
-    dist.pca.expr <- dist(scale(pca.expr$x[, 1:pc.k]), method = "euclidean")
+    dist.pca.expr <- dist(scale(pca.expr$x[, 1:eval.pc.n]), method = "euclidean")
     # dist.pca.expr <- dist(expr_sv, method = "euclidean")
     # silhouette width
     if (length(bio.group) == ncol(data)) {
@@ -70,7 +70,7 @@ AssessNormalization <- function(data.ls,
       batch_sil <- 0
     }
     
-    prk <- fpc::pamk(pca.expr$x[,1:pc.k], krange=pam.krange) # PAM clustering with user specified k
+    prk <- fpc::pamk(pca.expr$x[,1:eval.pc.n], krange=eval.pam.k) # PAM clustering with user specified k
     pam_sil <- prk$pamobject$silinfo$avg.width
     
     # Global distribution properties
@@ -84,7 +84,7 @@ AssessNormalization <- function(data.ls,
     # wanted factors from positive set 
     if (!is.null(pos.eval.set)) {
       wv_factors <- svd(scale(t(data.log[rownames(data.log) %in% pos.eval.set,]), center = TRUE, scale = TRUE),
-                        nu = pc.k, nv = 0)$u
+                        nu = eval.pc.n, nv = 0)$u
       # weighted coefficient of determination
       wv_cor <- 1 - sum(unlist(apply(expr_sv, 2, function(y) {
         lm(y ~ wv_factors)$residual
@@ -96,7 +96,7 @@ AssessNormalization <- function(data.ls,
     # unwanted factors from negative set
     if (!is.null(neg.eval.set)) {
       uv_factors <- svd(scale(t(data.log[rownames(data.log) %in% neg.eval.set,]), center = TRUE, scale = TRUE),
-                        nu = pc.k, nv = 0)$u
+                        nu = eval.pc.n, nv = 0)$u
       # weighted coefficient of determination
       uv_cor <- 1 - sum(unlist(apply(expr_sv, 2, function(y) {
         lm(y ~ uv_factors)$residual

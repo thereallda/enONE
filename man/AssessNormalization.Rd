@@ -9,8 +9,8 @@ AssessNormalization(
   bio.group = NULL,
   enrich.group = NULL,
   batch.group = NULL,
-  pam.krange = 2:6,
-  pc.k = 3,
+  eval.pam.k = 2:6,
+  eval.pc.n = 3,
   log = TRUE,
   pos.eval.set = NULL,
   neg.eval.set = NULL
@@ -29,11 +29,11 @@ enrichment and input samples in the raw/normalized count data matrix.}
 \item{batch.group}{Vector of index indicating the column index of
 each batch groups in the raw/normalized count data matrix.}
 
-\item{pam.krange}{Integer or vector of integers indicates the number of
-clusters for PAM clustering, default: 2:6.}
+\item{eval.pam.k}{Integer or vector of integers indicates the number of
+clusters for PAM clustering in performance evaluation, default: 2:6.}
 
-\item{pc.k}{Integer indicates the metrics will be calculated in the first kth
-PCs, default: 3.}
+\item{eval.pc.n}{Integer indicates the evaluation metrics will be calculated
+in the first nth PCs, default: 3.}
 
 \item{log}{Whether to perform log2-transformation with 1 offset on data matrix,
 default: TRUE.}

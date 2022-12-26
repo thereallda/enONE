@@ -107,7 +107,8 @@ Normalization and assessment can be achieved by wrapper function `enONE`
 ```{r}
 Enone <- enONE(Enone, 
                ruv.norm = TRUE, ruv.k = 3,
-               pam.krange = 2:6, pc.k = 3
+               eval.pam.k = 2:6, eval.pc.n = 3,
+               return.norm = FALSE,
                )
 ```
 
