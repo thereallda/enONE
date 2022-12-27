@@ -160,7 +160,14 @@ enONE <- function(object,
   Counts(object, slot = "spike_in", method = "Raw") <- counts_sp
   
   if (return.norm == TRUE) {
-    object@counts$sample <- norm.ls
+    # store normalized counts
+    object@counts$sample <- lapply(norm.ls, function(i) { i$dataNorm })
+    # store normalization factors
+    object@enone_factor$sample <- lapply(norm.ls, function(i) { i[c("normFactor", "adjustFactor")] })
+    # rename factor slot
+    for (i in 1:length(object@enone_factor$sample)) { 
+      names(object@enone_factor$sample[[i]]) <- c("normFactor", "adjustFactor")
+      }
   } 
   
   return(object)

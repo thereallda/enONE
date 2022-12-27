@@ -1,0 +1,20 @@
+url: https://thereallda.github.io/enONE/
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+navbar:
+  title: "enONE"
+  left: 
+    - text: "Vignettes"
+      menu:
+        - text: "enONE Tutorial"
+          href: articles/enONE_tutorial.html
+    - text: "Reference"
+      href: reference/index.html
+  right:
+    - icon: fa-home
+      href: ../
+    - icon: fa-github
+      href: https://github.com/thereallda/enONE
+    

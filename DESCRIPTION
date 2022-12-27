@@ -32,3 +32,8 @@ Imports:
     stringr,
     SummarizedExperiment,
     tibble
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+URL: https://thereallda.github.io/enONE/
