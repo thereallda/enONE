@@ -38,12 +38,8 @@ We start by reading in the data, including count matrix and metadata. It is reco
 
 ```{r,warning=FALSE,message=FALSE}
 library(enONE)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-library(tibble)
+library(tidyverse)
 library(patchwork)
-library(paintingr)
 
 # read in metadata and counts matrix
 counts.mat <- read.csv('../data/Counts.csv', row.names = 1)
