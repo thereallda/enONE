@@ -38,7 +38,10 @@ We start by reading in the data, including count matrix and metadata. It is reco
 
 ```{r,warning=FALSE,message=FALSE}
 library(enONE)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(tibble)
 library(patchwork)
 library(paintingr)
 
