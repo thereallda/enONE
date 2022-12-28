@@ -34,7 +34,7 @@ jobs:
           needs: website
       
       - name: Install dependencies
-        run: install.packages(c("tidyverse", "patchwork"))
+        run: install.packages(c("tidyverse", "patchwork", "EnvStats"))
         shell: Rscript {0}
       
       - name: Build site
