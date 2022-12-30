@@ -26,7 +26,7 @@ The hub metabolite, nicotinamide adenine dinucleotide (NAD), can be used as an i
 
 ## Setup
 
-For this tutorial, we will demonstrate the `enONE` workflow by using a NAD-RNA-seq data of peripheral blood mononuclear cells (PBMCs) from beagle dogs with 14 days of NMN supplementation or water gavage. Notably, we included three types of spike-in RNAs: 1) total RNAs from *Drosophila melanogaster*, an invertebrate model organism with well-annotated genome sequence, for estimating the unwanted variation; 2) synthetic RNAs, consisting of 5% NAD- relative to m7G-capped forms, were used to determine the capture sensitivity; 3) synthetic RNAs, with 100% m7G-capped forms, were used to determine the capture specificity (Figure 2A).
+For this tutorial, we will demonstrate the `enONE` workflow by using a NAD-RNA-seq data of peripheral blood mononuclear cells (PBMCs) from beagle dogs with 14 days of NMN supplementation or water gavage. Notably, we included three types of spike-in RNAs: 1) total RNAs from *Drosophila melanogaster*, an invertebrate model organism with well-annotated genome sequence, for estimating the unwanted variation; 2) synthetic RNAs, consisting of 5% NAD- relative to m7G-capped forms, were used to determine the capture sensitivity; 3) synthetic RNAs, with 100% m7G-capped forms, were used to determine the capture specificity (Figure below).
 
 There are 36 samples that were sequenced on the Illumina Novaseq 6000. The raw data can be found at [GSE221133](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?&acc=GSE221133).
 
@@ -120,7 +120,7 @@ For gene set selection, enONE defined three sets of control genes, including:
 
 -   Positive Evaluation (`PosEvaluation`): By default, `enONE` define the 500 most significantly enriched genes in samples of interest, ranked by edgeR FDR values, as positive evaluation genes for evaluation of the wanted variations.
 
-Gene selection can either be automatically defined in `enONE` function with `auto=TRUE` parameter, or be provided in `neg.control, pos.eval, neg.eval` parameters, respectively.
+Gene set selection can either be automatically defined in `enONE` function with `auto=TRUE` parameter (default), or be provided in `neg.control, pos.eval, neg.eval` parameters, respectively.
 
 Selected gene sets can be assessed by `getGeneSet` with the name of gene set (i.e., `"NegControl"`, `"NegEvaluation"`, `"PosEvaluation"`).
 
@@ -162,9 +162,9 @@ To evaluate the performance of normalization, `enONE` leverages eight normalizat
 
 4.  `PAM_SIM`: Similarity of PAM clustering groups. The maximum average silhouette width of clusters defined by PAM clustering (cluster by `eval.pam.k`), computed with the Euclidean distance metric over the first 3 expression PCs (default). Large values of `BAT_SIM` is desirable.
 
-5.  `WV_COR`: Preservation of biological variation. R\^2 measure for regression of first 3 expression PCs on first `eval.pc.n` PCs of the positive evaluation genes (`PosEvaluation`) sub-matrix of the raw count. Large values of `WV_COR` is desirable.
+5.  `WV_COR`: Preservation of biological variation. R^2^ measure for regression of first 3 expression PCs on first `eval.pc.n` PCs of the positive evaluation genes (`PosEvaluation`) sub-matrix of the raw count. Large values of `WV_COR` is desirable.
 
-6.  `UV_COR`: Removal of unwanted variation. R\^2 measure for regression of first 3 expression PCs on first `eval.pc.n` PCs of the negative evaluation genes (`NegEvaluation`) sub-matrix of the raw count. Low values of `UV_COR` is desirable.
+6.  `UV_COR`: Removal of unwanted variation. R^2^ measure for regression of first 3 expression PCs on first `eval.pc.n` PCs of the negative evaluation genes (`NegEvaluation`) sub-matrix of the raw count. Low values of `UV_COR` is desirable.
 
 7.  `RLE_MED`: The mean squared-median Relative Log Expression (RLE). Low values of `RLE_MED` is desirable.
 
@@ -212,14 +212,14 @@ norm.factors <- getFactor(Enone, slot = 'sample', method = norm.method)
 norm.method
 ```
 
-> To be noted, if normalized counts are not returned in `enONE` run step, you have to mannually perform the normalization method, before get the corresponding normalized counts, e.g.,
-
-```{r, eval=FALSE}
-# perform normalization
-Enone <- UseNormalization(Enone, slot = 'sample', method = 'TMM_RUVse_k3')
-# get normalized counts
-norm.data <- Counts(Enone, slot = 'sample', method = norm.method)
-```
+> To be noted, if normalized counts are not returned in `enONE` run step (i.e., `return.norm=FALSE`), you can manually perform the normalization method, e.g.,
+>
+> ```{r, eval=FALSE}
+> # perform normalization
+> Enone <- UseNormalization(Enone, slot = 'sample', method = 'TMM_RUVse_k3')
+> # get normalized counts
+> norm.data <- Counts(Enone, slot = 'sample', method = norm.method)
+> ```
 
 ## Effect of normalization
 
@@ -232,14 +232,16 @@ samples_name <- paste(Enone$condition, Enone$replicate, sep='.')
 # PCA for raw count
 p1 <- PCAplot(log1p(Counts(Enone, slot='sample', 'Raw')), 
             color = Enone$condition,
-            label = samples_name, vst.norm = FALSE) + 
+            label = NULL, vst.norm = FALSE) + 
   ggtitle('Before normalization')
 
 # PCA for normalized count
 p2 <- PCAplot(log1p(norm.data), 
             color = Enone$condition,
-            label = samples_name, vst.norm = FALSE) + 
+            label = NULL, vst.norm = FALSE) + 
   ggtitle('After normalization')
+
+# combine two plots
 p1 + p2
 ```
 
@@ -255,8 +257,10 @@ Use `getEnrichment` to retrieve a list of enrichment result tables.
 # find all enriched genes
 Enone <- FindEnrichment(Enone, slot='sample', method = norm.method, 
                         logfc.cutoff = 1, p.cutoff = 0.05)
+
 # get filtered enrichment results
 res.sig.ls <- getEnrichment(Enone, slot='sample', filter=TRUE)
+
 # count number of enrichment in each group
 unlist(lapply(res.sig.ls, nrow))
 ```
@@ -279,10 +283,13 @@ To convert list of enrichment result tables into data frame in long format, `enO
 ```{r}
 # simplify group id
 names(res.sig.ls) <- c('D0.Water', 'D14.Water', 'D0.NMN', 'D14.NMN')
+
 # logfc.col specify the name of logFC column
 nad_df1 <- reduceRes(res.sig.ls, logfc.col = 'logFC')
+
 # convert the Group column as factor
 nad_df1$Group <- factor(nad_df1$Group, levels = unique(nad_df1$Group))
+
 # draw plot
 bxp1 <- BetweenStatPlot(nad_df1, x='Group', y='logFC', color='Group', 
                         step.increase = 0.6, add.p = 'p', 
@@ -293,9 +300,9 @@ bxp1
 
 ## Handling synthetic spike-in RNA
 
-Since synthetic RNA, of which one with 5% NAD-caps and another with 100% m7G-caps, are included, we can determine the capture sensitivity and specificity.
+Since synthetic RNAs, of which one with 5% NAD-caps and another with 100% m7G-caps, are included, we can use these spike-ins to determine the capture sensitivity and specificity.
 
-`synEnrichment` calculate the enrichment levels of spike-in with given normalization method. `DotPlot` can be used to visualize the enrichment levels of synthetic spike-in.
+`synEnrichment` calculate the enrichment levels of synthetic spike-ins with given normalization method. `DotPlot` can be used to visualize the enrichment levels of synthetic spike-in.
 
 ```{r}
 # compute synthetic spike-in enrichment
@@ -332,7 +339,9 @@ save(Enone, file="data/Enone.RData")
 ## Session Info
 
 <details>
-  <summary>**Session Info**</summary>
+
+<summary>**Session Info**</summary>
+
 ```{r}
 sessionInfo()
 ```
