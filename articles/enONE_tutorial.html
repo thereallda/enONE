@@ -109,7 +109,7 @@ organism with well-annotated genome sequence, for estimating the
 unwanted variation; 2) synthetic RNAs, consisting of 5% NAD- relative to
 m7G-capped forms, were used to determine the capture sensitivity; 3)
 synthetic RNAs, with 100% m7G-capped forms, were used to determine the
-capture specificity (Figure 2A).</p>
+capture specificity (Figure below).</p>
 <p>There are 36 samples that were sequenced on the Illumina Novaseq
 6000. The raw data can be found at <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?&amp;acc=GSE221133" class="external-link">GSE221133</a>.</p>
 <p><img src="images/paste-BE49259B.png"></p>
@@ -285,9 +285,10 @@ genes for evaluation of the unwanted variations.</p></li>
 samples of interest, ranked by edgeR FDR values, as positive evaluation
 genes for evaluation of the wanted variations.</p></li>
 </ul>
-<p>Gene selection can either be automatically defined in
-<code>enONE</code> function with <code>auto=TRUE</code> parameter, or be
-provided in <code>neg.control, pos.eval, neg.eval</code> parameters,
+<p>Gene set selection can either be automatically defined in
+<code>enONE</code> function with <code>auto=TRUE</code> parameter
+(default), or be provided in
+<code>neg.control, pos.eval, neg.eval</code> parameters,
 respectively.</p>
 <p>Selected gene sets can be assessed by <code>getGeneSet</code> with
 the name of gene set (i.e., <code>"NegControl"</code>,
@@ -378,16 +379,16 @@ maximum average silhouette width of clusters defined by PAM clustering
 (cluster by <code>eval.pam.k</code>), computed with the Euclidean
 distance metric over the first 3 expression PCs (default). Large values
 of <code>BAT_SIM</code> is desirable.</p></li>
-<li><p><code>WV_COR</code>: Preservation of biological variation. R^2
-measure for regression of first 3 expression PCs on first
+<li><p><code>WV_COR</code>: Preservation of biological variation.
+R<sup>2</sup> measure for regression of first 3 expression PCs on first
 <code>eval.pc.n</code> PCs of the positive evaluation genes
 (<code>PosEvaluation</code>) sub-matrix of the raw count. Large values
 of <code>WV_COR</code> is desirable.</p></li>
-<li><p><code>UV_COR</code>: Removal of unwanted variation. R^2 measure
-for regression of first 3 expression PCs on first <code>eval.pc.n</code>
-PCs of the negative evaluation genes (<code>NegEvaluation</code>)
-sub-matrix of the raw count. Low values of <code>UV_COR</code> is
-desirable.</p></li>
+<li><p><code>UV_COR</code>: Removal of unwanted variation. R<sup>2</sup>
+measure for regression of first 3 expression PCs on first
+<code>eval.pc.n</code> PCs of the negative evaluation genes
+(<code>NegEvaluation</code>) sub-matrix of the raw count. Low values of
+<code>UV_COR</code> is desirable.</p></li>
 <li><p><code>RLE_MED</code>: The mean squared-median Relative Log
 Expression (RLE). Low values of <code>RLE_MED</code> is
 desirable.</p></li>
@@ -464,15 +465,14 @@ analysis.</p>
 <span><span class="co">#&gt; [1] "TMM_RUVse_k3"</span></span></code></pre></div>
 <blockquote>
 <p>To be noted, if normalized counts are not returned in
-<code>enONE</code> run step, you have to mannually perform the
-normalization method, before get the corresponding normalized counts,
-e.g.,</p>
-</blockquote>
+<code>enONE</code> run step (i.e., <code>return.norm=FALSE</code>), you
+can manually perform the normalization method, e.g.,</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># perform normalization</span></span>
 <span><span class="va">Enone</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/UseNormalization.html">UseNormalization</a></span><span class="op">(</span><span class="va">Enone</span>, slot <span class="op">=</span> <span class="st">'sample'</span>, method <span class="op">=</span> <span class="st">'TMM_RUVse_k3'</span><span class="op">)</span></span>
 <span><span class="co"># get normalized counts</span></span>
 <span><span class="va">norm.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Counts.html">Counts</a></span><span class="op">(</span><span class="va">Enone</span>, slot <span class="op">=</span> <span class="st">'sample'</span>, method <span class="op">=</span> <span class="va">norm.method</span><span class="op">)</span></span></code></pre></div>
+</blockquote>
 </div>
 <div class="section level2">
 <h2 id="effect-of-normalization">Effect of normalization<a class="anchor" aria-label="anchor" href="#effect-of-normalization"></a>
@@ -487,14 +487,16 @@ normalization.</p>
 <span><span class="co"># PCA for raw count</span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PCAplot.html">PCAplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log1p</a></span><span class="op">(</span><span class="fu"><a href="../reference/Counts.html">Counts</a></span><span class="op">(</span><span class="va">Enone</span>, slot<span class="op">=</span><span class="st">'sample'</span>, <span class="st">'Raw'</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>            color <span class="op">=</span> <span class="va">Enone</span><span class="op">$</span><span class="va">condition</span>,</span>
-<span>            label <span class="op">=</span> <span class="va">samples_name</span>, vst.norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>            label <span class="op">=</span> <span class="cn">NULL</span>, vst.norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">'Before normalization'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PCA for normalized count</span></span>
 <span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PCAplot.html">PCAplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log1p</a></span><span class="op">(</span><span class="va">norm.data</span><span class="op">)</span>, </span>
 <span>            color <span class="op">=</span> <span class="va">Enone</span><span class="op">$</span><span class="va">condition</span>,</span>
-<span>            label <span class="op">=</span> <span class="va">samples_name</span>, vst.norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>            label <span class="op">=</span> <span class="cn">NULL</span>, vst.norm <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">'After normalization'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># combine two plots</span></span>
 <span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code></pre></div>
 <p><img src="enONE_tutorial_files/figure-html/unnamed-chunk-15-1.png" width="1152"></p>
 </div>
@@ -517,8 +519,10 @@ result tables.</p>
 <code class="sourceCode R"><span><span class="co"># find all enriched genes</span></span>
 <span><span class="va">Enone</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindEnrichment.html">FindEnrichment</a></span><span class="op">(</span><span class="va">Enone</span>, slot<span class="op">=</span><span class="st">'sample'</span>, method <span class="op">=</span> <span class="va">norm.method</span>, </span>
 <span>                        logfc.cutoff <span class="op">=</span> <span class="fl">1</span>, p.cutoff <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># get filtered enrichment results</span></span>
 <span><span class="va">res.sig.ls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getEnrichment.html">getEnrichment</a></span><span class="op">(</span><span class="va">Enone</span>, slot<span class="op">=</span><span class="st">'sample'</span>, filter<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># count number of enrichment in each group</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">res.sig.ls</span>, <span class="va">nrow</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   D0_ctrl.Enrich_D0_ctrl.Input D14_ctrl.Enrich_D14_ctrl.Input </span></span>
@@ -563,10 +567,13 @@ modification level between groups.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># simplify group id</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">res.sig.ls</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'D0.Water'</span>, <span class="st">'D14.Water'</span>, <span class="st">'D0.NMN'</span>, <span class="st">'D14.NMN'</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># logfc.col specify the name of logFC column</span></span>
 <span><span class="va">nad_df1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reduceRes.html">reduceRes</a></span><span class="op">(</span><span class="va">res.sig.ls</span>, logfc.col <span class="op">=</span> <span class="st">'logFC'</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># convert the Group column as factor</span></span>
 <span><span class="va">nad_df1</span><span class="op">$</span><span class="va">Group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">nad_df1</span><span class="op">$</span><span class="va">Group</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">nad_df1</span><span class="op">$</span><span class="va">Group</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># draw plot</span></span>
 <span><span class="va">bxp1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/BetweenStatPlot.html">BetweenStatPlot</a></span><span class="op">(</span><span class="va">nad_df1</span>, x<span class="op">=</span><span class="st">'Group'</span>, y<span class="op">=</span><span class="st">'logFC'</span>, color<span class="op">=</span><span class="st">'Group'</span>, </span>
 <span>                        step.increase <span class="op">=</span> <span class="fl">0.6</span>, add.p <span class="op">=</span> <span class="st">'p'</span>, </span>
@@ -578,12 +585,13 @@ modification level between groups.</p>
 <div class="section level2">
 <h2 id="handling-synthetic-spike-in-rna">Handling synthetic spike-in RNA<a class="anchor" aria-label="anchor" href="#handling-synthetic-spike-in-rna"></a>
 </h2>
-<p>Since synthetic RNA, of which one with 5% NAD-caps and another with
-100% m7G-caps, are included, we can determine the capture sensitivity
-and specificity.</p>
+<p>Since synthetic RNAs, of which one with 5% NAD-caps and another with
+100% m7G-caps, are included, we can use these spike-ins to determine the
+capture sensitivity and specificity.</p>
 <p><code>synEnrichment</code> calculate the enrichment levels of
-spike-in with given normalization method. <code>DotPlot</code> can be
-used to visualize the enrichment levels of synthetic spike-in.</p>
+synthetic spike-ins with given normalization method.
+<code>DotPlot</code> can be used to visualize the enrichment levels of
+synthetic spike-in.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># compute synthetic spike-in enrichment</span></span>
 <span><span class="va">syn_level</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/synEnrichment.html">synEnrichment</a></span><span class="op">(</span><span class="va">Enone</span>, method<span class="op">=</span><span class="va">norm.method</span>, log<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
