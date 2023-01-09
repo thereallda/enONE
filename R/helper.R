@@ -476,8 +476,8 @@ PCAplot <- function(object, use.pc=c(1,2),
           legend.position = "top",
           axis.text = element_text(color="black")) +
     scale_color_manual(values = palette) +
-    labs(x=paste0(use.pc[1], ": ", pc.var[1]*100, "%"),
-         y=paste0(use.pc[2], ": ", pc.var[2]*100, "%"))
+    labs(x=paste0(use.pc[1], ": ", pc.var[ use.pc[1] ]*100, "%"),
+         y=paste0(use.pc[2], ": ", pc.var[ use.pc[2] ]*100, "%"))
   
   # add text label
   if (!is.null(label)) {

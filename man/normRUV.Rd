@@ -31,8 +31,8 @@ compute the count differences used to estimate the factors of unwanted variation
 unwanted variation, default drop the first singular value that represent the
 difference between enrichment and input.}
 
-\item{log}{Whether to perform log2-transformation with 1 offset on data matrix,
-default: TRUE.}
+\item{log}{Whether to perform log2-transformation with 1 offset on data
+matrix (default: TRUE), while normalized counts are returned in non-log format.}
 }
 \value{
 List containing normalized counts and adjust factors for adjusting unwanted variation.
