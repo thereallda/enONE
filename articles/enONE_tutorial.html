@@ -237,7 +237,7 @@ use all samples in following analysis.</p>
 <span><span class="co">## all samples pass the test</span></span>
 <span><span class="fu">EnvStats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/EnvStats/man/rosnerTest.html" class="external-link">rosnerTest</a></span><span class="op">(</span><span class="va">pc</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">all.stats</span></span>
 <span><span class="co">#&gt;   i        Mean.i     SD.i    Value Obs.Num    R.i+1 lambda.i+1 Outlier</span></span>
-<span><span class="co">#&gt; 1 0  4.350301e-15 118.1289 144.0791      32 1.219678   2.990585   FALSE</span></span>
+<span><span class="co">#&gt; 1 0 -1.381495e-14 118.1289 144.0791      32 1.219678   2.990585   FALSE</span></span>
 <span><span class="co">#&gt; 2 1 -4.116547e+00 117.2043 138.1465      28 1.213804   2.978183   FALSE</span></span>
 <span><span class="co">#&gt; 3 2 -8.300754e+00 116.2832 133.1332      27 1.216288   2.965315   FALSE</span></span></code></pre></div>
 </div>
@@ -345,13 +345,13 @@ effect was assumed to be constant.</p>
 <p>Normalized counts can be assessed by <code>Counts</code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/Counts.html">Counts</a></span><span class="op">(</span><span class="va">Enone</span>, slot<span class="op">=</span><span class="st">"sample"</span>, method<span class="op">=</span><span class="st">"TMM_RUVse_k3"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
-<span><span class="co">#&gt;                             C1          C2          C3          C5          C6</span></span>
-<span><span class="co">#&gt; ENSCAFG00845015217   0.1270775   0.1580804   0.5073167   0.1972178   0.1473110</span></span>
-<span><span class="co">#&gt; ENSCAFG00845015316   0.6467976   1.1029219   0.7496786   0.9257258   0.6365079</span></span>
-<span><span class="co">#&gt; ENSCAFG00845015457 213.0782649 191.3361797 145.7496546 223.9916657 182.9394510</span></span>
-<span><span class="co">#&gt; ENSCAFG00845015550  22.7519362  26.4536677  24.4529529  20.3535993  24.0241785</span></span>
-<span><span class="co">#&gt; ENSCAFG00845015637   4.1985951   4.7444409   4.4990044   4.1284498   5.3711438</span></span>
-<span><span class="co">#&gt; ENSCAFG00845015701   4.7503025   5.2315408   5.1139479   6.6107143   6.7737966</span></span></code></pre></div>
+<span><span class="co">#&gt;                            C1          C2         C3         C5         C6</span></span>
+<span><span class="co">#&gt; ENSCAFG00845015217   0.000000   0.0000000   0.000000   0.000000   0.000000</span></span>
+<span><span class="co">#&gt; ENSCAFG00845015316   0.000000   0.1029219   0.000000   0.000000   0.000000</span></span>
+<span><span class="co">#&gt; ENSCAFG00845015457 212.078265 190.3361797 144.749655 222.991666 181.939451</span></span>
+<span><span class="co">#&gt; ENSCAFG00845015550  21.751936  25.4536677  23.452953  19.353599  23.024178</span></span>
+<span><span class="co">#&gt; ENSCAFG00845015637   3.198595   3.7444409   3.499004   3.128450   4.371144</span></span>
+<span><span class="co">#&gt; ENSCAFG00845015701   3.750302   4.2315408   4.113948   5.610714   5.773797</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="evaluation">Evaluation<a class="anchor" aria-label="anchor" href="#evaluation"></a>
@@ -398,34 +398,34 @@ of RLE. Low values of <code>RLE_IQR</code> is desirable.</p></li>
 <p>Evaluation metrics can be assessed by <code>getMetrics</code></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getMetrics.html">getMetrics</a></span><span class="op">(</span><span class="va">Enone</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
-<span><span class="co">#&gt;                        BIO_SIM    EN_SIM BATCH_SIM   PAM_SIM      RLE_MED</span></span>
-<span><span class="co">#&gt; TMM_RUVse_k3       0.004010675 0.3672915         0 0.7215727 0.0012331000</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k3        0.264969797 0.3526664         0 0.6917263 0.0013922471</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k2        0.273545725 0.3529028         0 0.6912465 0.0014106631</span></span>
-<span><span class="co">#&gt; PossionSeq_RUVs_k2 0.162922204 0.3557378         0 0.6791057 0.0001844717</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k1        0.323222896 0.3572111         0 0.6832383 0.0017360384</span></span>
-<span><span class="co">#&gt;                       RLE_IQR    WV_COR    UV_COR</span></span>
-<span><span class="co">#&gt; TMM_RUVse_k3       0.02174805 0.8464516 0.3908795</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k3        0.02437620 0.6853092 0.1459999</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k2        0.02708899 0.7287250 0.1508830</span></span>
-<span><span class="co">#&gt; PossionSeq_RUVs_k2 0.07336386 0.9182946 0.2784424</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k1        0.03318628 0.8619031 0.2170877</span></span></code></pre></div>
+<span><span class="co">#&gt;                  BIO_SIM    EN_SIM BATCH_SIM   PAM_SIM      RLE_MED    RLE_IQR</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k2  0.278592119 0.3611790         0 0.6945911 0.0001712504 0.03972549</span></span>
+<span><span class="co">#&gt; TMM_RUVse_k3 0.002308382 0.3669041         0 0.7233990 0.0001648237 0.03226268</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k3  0.330328453 0.3569549         0 0.6935086 0.0002230423 0.03704901</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k2   0.281589314 0.3631537         0 0.6959381 0.0009312077 0.04263192</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k3   0.314761362 0.3601166         0 0.6949188 0.0010200989 0.03928136</span></span>
+<span><span class="co">#&gt;                 WV_COR    UV_COR</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k2  0.7590828 0.1651439</span></span>
+<span><span class="co">#&gt; TMM_RUVse_k3 0.8452121 0.3749096</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k3  0.7369012 0.1430382</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k2   0.7587947 0.1828784</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k3   0.7278541 0.1643650</span></span></code></pre></div>
 <p>Evaluation score is the average rank of each performance metrics,
 which can be assessed by <code>getScore</code></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getScore.html">getScore</a></span><span class="op">(</span><span class="va">Enone</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
-<span><span class="co">#&gt;                    BIO_SIM EN_SIM BATCH_SIM PAM_SIM RLE_MED RLE_IQR WV_COR</span></span>
-<span><span class="co">#&gt; TMM_RUVse_k3            29     54         1      48      47      45     15</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k3             50     36         1      36      46      37      3</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k2             52     37         1      35      45      31      8</span></span>
-<span><span class="co">#&gt; PossionSeq_RUVs_k2      43     43         1      17      59       7     43</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k1             55     47         1      25      39      22     19</span></span>
-<span><span class="co">#&gt;                    UV_COR    SCORE</span></span>
-<span><span class="co">#&gt; TMM_RUVse_k3           29 38.14286</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k3            58 38.00000</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k2            57 37.85714</span></span>
-<span><span class="co">#&gt; PossionSeq_RUVs_k2     50 37.42857</span></span>
-<span><span class="co">#&gt; TMM_RUVs_k1            53 37.14286</span></span></code></pre></div>
+<span><span class="co">#&gt;              BIO_SIM EN_SIM BATCH_SIM PAM_SIM RLE_MED RLE_IQR WV_COR UV_COR</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k2       50     46         1      37      59      31     10     56</span></span>
+<span><span class="co">#&gt; TMM_RUVse_k3      29     50         1      50      60      40     18     39</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k3       56     37         1      35      57      37      5     58</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k2        51     47         1      39      44      27      9     55</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k3        54     43         1      38      43      32      4     57</span></span>
+<span><span class="co">#&gt;                 SCORE</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k2  41.28571</span></span>
+<span><span class="co">#&gt; TMM_RUVse_k3 40.85714</span></span>
+<span><span class="co">#&gt; TMM_RUVs_k3  40.71429</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k2   38.85714</span></span>
+<span><span class="co">#&gt; UQ_RUVs_k3   38.71429</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -462,7 +462,7 @@ analysis.</p>
 <span><span class="va">norm.factors</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getFactor.html">getFactor</a></span><span class="op">(</span><span class="va">Enone</span>, slot <span class="op">=</span> <span class="st">'sample'</span>, method <span class="op">=</span> <span class="va">norm.method</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">norm.method</span></span>
-<span><span class="co">#&gt; [1] "TMM_RUVse_k3"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "TMM_RUVs_k2"</span></span></code></pre></div>
 <blockquote>
 <p>To be noted, if normalized counts are not returned in
 <code>enONE</code> run step (i.e., <code>return.norm=FALSE</code>), you
@@ -526,9 +526,9 @@ result tables.</p>
 <span><span class="co"># count number of enrichment in each group</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">res.sig.ls</span>, <span class="va">nrow</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   D0_ctrl.Enrich_D0_ctrl.Input D14_ctrl.Enrich_D14_ctrl.Input </span></span>
-<span><span class="co">#&gt;                           2167                           2102 </span></span>
+<span><span class="co">#&gt;                           2312                           2232 </span></span>
 <span><span class="co">#&gt;     D0_nmn.Enrich_D0_nmn.Input   D14_nmn.Enrich_D14_nmn.Input </span></span>
-<span><span class="co">#&gt;                           2688                           2402</span></span></code></pre></div>
+<span><span class="co">#&gt;                           2841                           2312</span></span></code></pre></div>
 <p>Each enrichment table is a <code>data.frame</code> with a list of
 genes as rows, and associated information as columns (GeneID, logFC,
 p-values, etc.). The following columns are present in the table:</p>
@@ -553,12 +553,12 @@ method is applied.</li>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res.sig.ls</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;               GeneID    logFC    logCPM       LR        PValue           FDR</span></span>
-<span><span class="co">#&gt; 1 ENSCAFG00845007784 2.959802  8.717648 509.4189 8.484765e-113 1.231648e-108</span></span>
-<span><span class="co">#&gt; 2 ENSCAFG00845002083 3.157457 12.584706 375.8864  9.784997e-84  7.101951e-80</span></span>
-<span><span class="co">#&gt; 3 ENSCAFG00845009430 2.510118  7.642940 340.5231  4.908601e-76  2.375108e-72</span></span>
-<span><span class="co">#&gt; 4 ENSCAFG00845000887 2.287440  7.351301 299.2720  4.746529e-67  1.722515e-63</span></span>
-<span><span class="co">#&gt; 5 ENSCAFG00845007809 3.177614  6.102379 295.1592  3.736355e-66  1.084738e-62</span></span>
-<span><span class="co">#&gt; 6 ENSCAFG00845016135 2.327771  9.398165 293.5746  8.273551e-66  2.001648e-62</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 ENSCAFG00845007784 3.055073  8.717684 878.7366 4.114221e-193 5.972203e-189</span></span>
+<span><span class="co">#&gt; 2 ENSCAFG00845002083 3.113414 12.584709 664.1688 1.852380e-146 1.344457e-142</span></span>
+<span><span class="co">#&gt; 3 ENSCAFG00845009430 2.460452  7.643004 591.0913 1.450530e-130 7.018629e-127</span></span>
+<span><span class="co">#&gt; 4 ENSCAFG00845018743 2.407697  9.528866 578.4103 8.315389e-128 3.017655e-124</span></span>
+<span><span class="co">#&gt; 5 ENSCAFG00845021389 2.759788  8.554199 564.7637 7.733279e-125 2.245125e-121</span></span>
+<span><span class="co">#&gt; 6 ENSCAFG00845000887 2.353257  7.351376 553.5413 2.136043e-122 5.167800e-119</span></span></code></pre></div>
 <p>To convert list of enrichment result tables into data frame in long
 format, <code>enONE</code> package provide <code>reduceRes</code>
 function for this task. Finally, you can use
@@ -688,7 +688,7 @@ no enrichment is found for Syn2 made up with 100% m7G-RNA.</p>
 <span><span class="co">#&gt;  [65] pkgconfig_2.0.3             XML_3.99-0.13              </span></span>
 <span><span class="co">#&gt;  [67] flexmix_2.3-18              nnet_7.3-18                </span></span>
 <span><span class="co">#&gt;  [69] sass_0.4.4                  dbplyr_2.2.1               </span></span>
-<span><span class="co">#&gt;  [71] locfit_1.5-9.6              utf8_1.2.2                 </span></span>
+<span><span class="co">#&gt;  [71] locfit_1.5-9.7              utf8_1.2.2                 </span></span>
 <span><span class="co">#&gt;  [73] labeling_0.4.2              tidyselect_1.2.0           </span></span>
 <span><span class="co">#&gt;  [75] rlang_1.0.6                 AnnotationDbi_1.58.0       </span></span>
 <span><span class="co">#&gt;  [77] munsell_0.5.0               cellranger_1.1.0           </span></span>
