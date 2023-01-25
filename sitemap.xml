@@ -40,10 +40,16 @@
     <loc>https://thereallda.github.io/enONE/reference/DotPlot.html</loc>
   </url>
   <url>
+    <loc>https://thereallda.github.io/enONE/reference/FilterLowExprGene.html</loc>
+  </url>
+  <url>
     <loc>https://thereallda.github.io/enONE/reference/FindEnrichment.html</loc>
   </url>
   <url>
     <loc>https://thereallda.github.io/enONE/reference/GeneSelection.html</loc>
+  </url>
+  <url>
+    <loc>https://thereallda.github.io/enONE/reference/OutlierTest.html</loc>
   </url>
   <url>
     <loc>https://thereallda.github.io/enONE/reference/PCA_Biplot.html</loc>
