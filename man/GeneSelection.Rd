@@ -4,7 +4,7 @@
 \alias{GeneSelection}
 \title{Gene set selection}
 \usage{
-GeneSelection(object, n.neg.control, n.pos.eval, n.neg.eval)
+GeneSelection(object, n.neg.control = 1000, n.pos.eval = 500, n.neg.eval = 500)
 }
 \arguments{
 \item{object}{Enone object}

@@ -272,11 +272,9 @@ normRUV <- function(data,
   }
   
   # return natural values
-  dataNorm <- 2^(ruv.set$normalizedCounts)-1
+  dataNorm <- 2^(ruv.set$normalizedCounts)
   # restore zero
   dataNorm[zero.idx] <- 0
-  # set negative values as zero
-  dataNorm[dataNorm < 0] <- 0
   
   return(list(
     dataNorm = dataNorm,

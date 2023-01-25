@@ -15,9 +15,9 @@
 #' @importFrom utils head
 #' @importFrom stats model.matrix as.formula
 GeneSelection <- function(object,
-                          n.neg.control,
-                          n.pos.eval,
-                          n.neg.eval) {
+                          n.neg.control = 1000,
+                          n.pos.eval = 500,
+                          n.neg.eval = 500) {
   
   # retrieve parameters from Enone object
   bio.group <- object$condition

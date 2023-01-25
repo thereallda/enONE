@@ -42,8 +42,8 @@ library(tidyverse)
 library(patchwork)
 
 # read in metadata and counts matrix
-counts.mat <- read.csv('../data/Counts.csv', row.names = 1)
-meta <- read.csv('../data/metadata.csv', comment.char = '#')
+counts.mat <- read.csv('data/Counts.csv', row.names = 1)
+meta <- read.csv('data/metadata.csv', comment.char = '#')
 meta
 ```
 
@@ -105,7 +105,8 @@ The main `enONE` function can be used to perform gene selection, normalization, 
 Enone <- enONE(Enone, 
                scaling.method = c("TC", "UQ", "TMM", "DESeq", "PossionSeq"),
                ruv.norm = TRUE, ruv.k = 3,
-               eval.pam.k = 2:6, eval.pc.n = 3,
+               eval.pam.k = 2:8, eval.pc.n = 3, 
+               n.pos.eval = 1200, n.neg.eval = 500,
                return.norm = TRUE
                )
 ```
@@ -230,9 +231,9 @@ We perform PCA based on the count matrix from sample of interest before and afte
 samples_name <- paste(Enone$condition, Enone$replicate, sep='.')
 
 # PCA for raw count
-p1 <- PCAplot(log1p(Counts(Enone, slot='sample', 'Raw')), 
+p1 <- PCAplot(Counts(Enone, slot='sample', 'Raw'), 
             color = Enone$condition,
-            label = NULL, vst.norm = FALSE) + 
+            label = NULL, vst.norm = TRUE) + 
   ggtitle('Before normalization')
 
 # PCA for normalized count

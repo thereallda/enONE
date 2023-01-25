@@ -16,6 +16,7 @@ Imports:
     DESeq2,
     dplyr,
     edgeR,
+    EnvStats,
     fpc,
     ggplot2,
     ggpubr,

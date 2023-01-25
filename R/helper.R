@@ -668,6 +668,75 @@ DotPlot <- function(data, x, y, fill = NULL, palette = NULL) {
   return(c(y=m, ymin=ymin, ymax=ymax))
 }
 
+#' Filter Low Expressed Genes
+#'
+#' @param x Enone object
+#' @param group Vector or factor giving group membership for a oneway layout, 
+#' if appropriate, default: NULL. 
+#' @param min.count Minimum count required for at least some samples, default: 10. 
+#'
+#' @return updated Enone object
+#' @export
+#'
+FilterLowExprGene <- function(x, group=NULL, min.count=10) {
+  # get counts
+  data <- x@assays@data@listData[[1]]
+  
+  # size of minimum samples
+  if (is.null(group)) {
+    min_sample <- ncol(data)
+  } else {
+    group <- as.factor(group)
+    n_sample <- tabulate(group)
+    min_sample <- min(n_sample[n_sample > 0])
+  }
+  
+  # filter low genes
+  keep <- rowSums(data >= min.count) >= min_sample
+  x <- x[keep, ]
+  return(x)
+  
+}
+
+#' Outlier Test
+#' 
+#' @description Rosner’s outlier test on principal component 1 to assess and 
+#' remove potential outliers.
+#'
+#' @param x Enone object
+#' @param remove Whether to remove outliers, default: FALSE
+#'
+#' @return updated Enone object
+#' @export
+#'
+#' @importFrom DESeq2 vst
+#' @importFrom EnvStats rosnerTest
+OutlierTest <- function(x, remove=FALSE) {
+  # get counts
+  data <- as.matrix(x@assays@data@listData[[1]])
+  
+  # variance stabilizing transformation
+  vt <- DESeq2::vst(data)
+  
+  # pricipal component analysis
+  pc <- prcomp(t(vt))
+  
+  # Rosner’s outlier test on principal component 1
+  test <- EnvStats::rosnerTest(pc$x[,1])$all.stats
+  
+  if (sum(test$Outlier) > 0 & remove) {
+    outlier.idx <- test[test$Outlier == TRUE, ]$Obs.Num
+    x <- x[, -outlier.idx]
+  }
+  
+  # print test message
+  cat("Rosner's outlier test\n")
+  print(test)
+  
+  return(x)
+  
+}
+
 # For adjusting no visible binding
 ## reduceRes
 utils::globalVariables(c("GeneID", "Group"))
