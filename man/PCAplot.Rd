@@ -10,6 +10,7 @@ PCAplot(
   color = NULL,
   label = NULL,
   shape = NULL,
+  title = NULL,
   vst.norm = FALSE,
   palette = NULL,
   repel = TRUE
@@ -25,6 +26,8 @@ PCAplot(
 \item{label}{Vector of sample names or labels, default NULL.}
 
 \item{shape}{Vector indicates the shape mapping of samples, default NULL.}
+
+\item{title}{Plot title, default NULL.}
 
 \item{vst.norm}{Whether to perform \code{vst} transformation, default FALSE.}
 

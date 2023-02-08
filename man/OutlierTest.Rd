@@ -4,12 +4,15 @@
 \alias{OutlierTest}
 \title{Outlier Test}
 \usage{
-OutlierTest(x, remove = FALSE)
+OutlierTest(x, return = FALSE, remove = FALSE)
 }
 \arguments{
 \item{x}{Enone object}
 
-\item{remove}{Whether to remove outliers, default: FALSE}
+\item{return}{Whether to return object or simply perform test, default FALSE}
+
+\item{remove}{Whether to remove outliers. If TRUE, must be paired with
+"return=TRUE", default: FALSE}
 }
 \value{
 updated Enone object

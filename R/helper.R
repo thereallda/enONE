@@ -48,7 +48,7 @@ FindEnrichment <-  function(object, slot=c("sample","spike_in"), method,
                     contrast.df = contrast_df,
                     norm.factors = factor.ls$normFactor,
                     adjust.factors = factor.ls$adjustFactor,
-                    logfc.cutoff=logfc.cutoff, p.cutoff=p.cutoff, ...)
+                    logfc.cutoff = logfc.cutoff, p.cutoff = p.cutoff, ...)
     } else {
       # if only norm factors were provided
       de <- edgeRDE(counts = counts_df,
@@ -56,7 +56,7 @@ FindEnrichment <-  function(object, slot=c("sample","spike_in"), method,
                     contrast.df = contrast_df,
                     norm.factors = factor.ls$normFactor,
                     design.formula = as.formula("~0+condition"),
-                    logfc.cutoff=logfc.cutoff, p.cutoff=p.cutoff, ...)
+                    logfc.cutoff = logfc.cutoff, p.cutoff = p.cutoff, ...)
     }
   } else {
     stop("One or both of \"normFactor\" and \"adjustFacotr\" should be provided.")
@@ -277,6 +277,7 @@ synEnrichment <- function(object, method="TC", log=TRUE) {
 #' @importFrom limma makeContrasts
 #' @importFrom rlang .data
 #' @importFrom tibble rownames_to_column
+#' @importFrom pbapply pblapply
 edgeRDE <- function(counts, 
                     group,  
                     norm.factors = NULL, 
@@ -302,35 +303,61 @@ edgeRDE <- function(counts,
     design.mat <- stats::model.matrix(as.formula(paste("~0+", paste(colnames(design.df), collapse = "+"))), data = design.df)
   }
   
-  degs <- edgeR::estimateDisp(degs, design = design.mat)
-  fit.glm <- edgeR::glmFit(degs, design = design.mat)
+  # estimate dispersion and fit GLM with progress bar
+  cat("Estimate dispersion & Fit GLM... \n")
   
-  # extract DE results
+  de.ls1 <- pbapply::pblapply(1, function(i) {
+    degs <- edgeR::estimateDisp(degs, design = design.mat)
+    fit.glm <- edgeR::glmFit(degs, design = design.mat)
+    return(list(degs=degs, fit.glm=fit.glm))
+  })
+  # unlist
+  degs <- de.ls1[[1]]$degs
+  fit.glm <- de.ls1[[1]]$fit.glm
+  
+  # LRT 
+  cat("Testing differential genes... \n")
   if (is.null(coef) & !is.null(contrast.df)) {
+    # construct contrast
     contrast.vec <- apply(contrast.df, 1, function(x) { paste(paste0("condition",x), collapse="-") })
-    contrast.mat <- limma::makeContrasts(contrasts = contrast.vec, levels = design.mat)
-    lrt.ls <- apply(contrast.mat, 2, function(x) { edgeR::glmLRT(fit.glm, contrast = x) })  
-    names(lrt.ls) <- gsub("-","_",gsub("condition","",contrast.vec))
+    # progress bar
+    de.ls2 <- pbapply::pblapply(1:length(contrast.vec), function(i) {
+      contrast.mat <- limma::makeContrasts(contrasts = contrast.vec[i], levels=design.mat)
+      # LRT 
+      lrt.glm <- edgeR::glmLRT(fit.glm, contrast = contrast.mat)
+      
+      # extract DE results
+      res1 <- edgeR::topTags(lrt.glm, n = Inf, adjust.method = "BH")
+      res.tab <- res1$table %>% tibble::rownames_to_column(var = "GeneID")
+      
+      # filter significant DEGs
+      if (only.pos) {
+        res.sig.tab <- res.tab[res.tab$logFC >= logfc.cutoff & res.tab$FDR < p.cutoff,]
+      } else {
+        res.sig.tab <- res.tab[abs(res.tab$logFC) >= logfc.cutoff & res.tab$FDR < p.cutoff,]
+      }
+      return(list(res.tab = res.tab, res.sig.tab = res.sig.tab))
+    })
+    # unlist 
+    res.ls <- lapply(de.ls2, function(x) x$res.tab)
+    res.sig.ls <- lapply(de.ls2, function(x) x$res.sig.tab)
+    names(res.ls) <- names(res.sig.ls) <- gsub("-","_",gsub("condition","",contrast.vec))
   } 
   if (!is.null(coef) & is.null(contrast.df)) { 
-    lrt.ls <- list(edgeR::glmLRT(fit.glm, coef = coef)) 
-    # names(lrt.ls) <- gsub("condition","",paste(colnames(design.mat)[coef], collapse = "_"))
-  }
-  
-  res.ls <- lapply(lrt.ls, function(x) {
-    res1 <- edgeR::topTags(x, n = Inf, adjust.method = "BH")
-    res.tab <- res1$table %>% tibble::rownames_to_column(var = "GeneID")
-    return(res.tab)
-  })
-  
-  # names(res.ls) <- gsub("condition", "", contrast.vec)
-  # significant DEGs
-  if (only.pos) {
-    # return only positive regulated genes
-    res.sig.ls <- lapply(res.ls, function(x) { x[x$logFC >= logfc.cutoff & x$FDR < p.cutoff,] })
-  } else {
-    # return both positive and negative regulated genes
-    res.sig.ls <- lapply(res.ls, function(x) { x[abs(x$logFC) >= logfc.cutoff & x$FDR < p.cutoff,] })
+    de.ls2 <- pbapply::pblapply(1, function(i) {
+      lrt.glm <- edgeR::glmLRT(fit.glm, coef = coef)
+      res1 <- edgeR::topTags(lrt.glm, n = Inf, adjust.method = "BH")
+      res.tab <- res1$table %>% tibble::rownames_to_column(var = "GeneID")
+      # filter significant DEGs
+      if (only.pos) {
+        res.sig.tab <- res.tab[res.tab$logFC >= logfc.cutoff & res.tab$FDR < p.cutoff,]
+      } else {
+        res.sig.tab <- res.tab[abs(res.tab$logFC) >= logfc.cutoff & res.tab$FDR < p.cutoff,]
+      }
+      return(list(res.tab = res.tab, res.sig.tab = res.sig.tab))
+    })
+    res.ls <- lapply(de.ls2, function(x) x$res.tab)
+    res.sig.ls <- lapply(de.ls2, function(x) x$res.sig.tab)
   }
   
   return(list(de.obj = degs, res.ls = res.ls, res.sig.ls = res.sig.ls))
@@ -410,6 +437,7 @@ reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
 #' @param color Vector indicates the color mapping of samples, default NULL.
 #' @param label Vector of sample names or labels, default NULL.
 #' @param shape Vector indicates the shape mapping of samples, default NULL.
+#' @param title Plot title, default NULL. 
 #' @param vst.norm Whether to perform \code{vst} transformation, default FALSE.
 #' @param palette The color palette for different groups.
 #' @param repel Whether to use \code{ggrepel} to avoid overlapping text labels or not, default TRUE.
@@ -424,7 +452,7 @@ reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
 #' @importFrom stats prcomp
 #' @importFrom paintingr paint_palette
 PCAplot <- function(object, use.pc=c(1,2),
-                  color=NULL, label=NULL, shape=NULL,
+                  color=NULL, label=NULL, shape=NULL, title=NULL,
                   vst.norm=FALSE, palette=NULL, repel=TRUE) {
   if (vst.norm) {
     counts_norm <- DESeq2::vst(as.matrix(object))
@@ -477,7 +505,8 @@ PCAplot <- function(object, use.pc=c(1,2),
           axis.text = element_text(color="black")) +
     scale_color_manual(values = palette) +
     labs(x=paste0(use.pc[1], ": ", pc.var[ use.pc[1] ]*100, "%"),
-         y=paste0(use.pc[2], ": ", pc.var[ use.pc[2] ]*100, "%"))
+         y=paste0(use.pc[2], ": ", pc.var[ use.pc[2] ]*100, "%"),
+         title=title)
   
   # add text label
   if (!is.null(label)) {
@@ -562,6 +591,7 @@ PCA_Biplot <- function(object, score, pt.label=TRUE, interactive=FALSE) {
 #' @param add.p Label p-value or adjusted p-value, must be one of c("p", "p.adj").
 #' @param step.increase Numeric vector with the increase in fraction of total height for every additional comparison to minimize overlap.
 #' @param comparisons	A list of length-2 vectors specifying the groups of interest to be compared. For example to compare groups "A" vs "B" and "B" vs "C", the argument is as follow: comparisons = list(c("A", "B"), c("B", "C"))
+#' @param title Plot title, default NULL. 
 #' @return ggplot2 object
 #' @export
 #'
@@ -575,7 +605,8 @@ BetweenStatPlot <- function(data, x, y, color, palette = NULL,
                             test = c("wilcox.test", "t.test", "none"),
                             add.p = c("p", "p.adj"),
                             comparisons = NULL,
-                            step.increase=0.3) {
+                            step.increase = 0.3,
+                            title = NULL) {
   stat.formula <- stats::as.formula(paste(y, "~", x))
 
   test <- match.arg(test, choices = c("wilcox.test", "t.test", "none"))
@@ -607,7 +638,7 @@ BetweenStatPlot <- function(data, x, y, color, palette = NULL,
           axis.text = element_text(color="black")) +
     scale_color_manual(values = palette) +
     scale_x_discrete(labels = x.labs) +
-    labs(x="")
+    labs(x="", title=title)
 
   if (exists("stat_dat")) {
     p <- p + ggpubr::stat_pvalue_manual(data = stat_dat, label = add.p, tip.length = 0.01, size = 3)
@@ -704,14 +735,16 @@ FilterLowExprGene <- function(x, group=NULL, min.count=10) {
 #' remove potential outliers.
 #'
 #' @param x Enone object
-#' @param remove Whether to remove outliers, default: FALSE
+#' @param return Whether to return object or simply perform test, default FALSE
+#' @param remove Whether to remove outliers. If TRUE, must be paired with 
+#' "return=TRUE", default: FALSE
 #'
 #' @return updated Enone object
 #' @export
 #'
 #' @importFrom DESeq2 vst
 #' @importFrom EnvStats rosnerTest
-OutlierTest <- function(x, remove=FALSE) {
+OutlierTest <- function(x, return=FALSE, remove=FALSE) {
   # get counts
   data <- as.matrix(x@assays@data@listData[[1]])
   
@@ -724,7 +757,7 @@ OutlierTest <- function(x, remove=FALSE) {
   # Rosner’s outlier test on principal component 1
   test <- EnvStats::rosnerTest(pc$x[,1])$all.stats
   
-  if (sum(test$Outlier) > 0 & remove) {
+  if (sum(test$Outlier) > 0 & return & remove) {
     outlier.idx <- test[test$Outlier == TRUE, ]$Obs.Num
     x <- x[, -outlier.idx]
   }
@@ -733,8 +766,9 @@ OutlierTest <- function(x, remove=FALSE) {
   cat("Rosner's outlier test\n")
   print(test)
   
-  return(x)
-  
+  if (return) {
+    return(x)
+  }
 }
 
 # For adjusting no visible binding

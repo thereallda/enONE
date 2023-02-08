@@ -81,8 +81,7 @@ The `enONE` workflow consists of four steps: 1) Quality control; 2) Gene set sel
 `enONE` initiate with quality control step to filter lowly-expressed genes. This step is performed with `filterByExpr` from `edgeR` package.
 
 ```{r}
-keep <- edgeR::filterByExpr(counts.mat, group = meta$condition)
-Enone <- Enone[keep, ]
+Enone <- FilterLowExprGene(Enone, group = Enone$condition, min.count = 20)
 Enone
 ```
 
@@ -90,11 +89,7 @@ Additionally, outliers can be assessed by Rosner's outlier test on principal com
 
 ```{r}
 ## ronser's test for outlier assessment
-vt <- DESeq2::vst(as.matrix(SummarizedExperiment::assay(Enone)), nsub = 20000)
-pc <- prcomp(t(vt))
-
-## all samples pass the test
-EnvStats::rosnerTest(pc$x[,1])$all.stats
+OutlierTest(Enone, return=FALSE)
 ```
 
 ### Running enONE

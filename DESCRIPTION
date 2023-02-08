@@ -25,6 +25,7 @@ Imports:
     MatrixGenerics,
     methods,
     paintingr,
+    pbapply,
     plotly,
     rlang,
     rstatix,
