@@ -17,9 +17,11 @@
 #'   The first row is the column index of input and the second row is the 
 #'   column index of enrichment samples.
 #' @param spike.in.prefix A character specify the prefix of spike-in id. 
-#'
+#' 
 #' @return List of objects containing normalized data and associated normalization factors. 
 #' @export
+#' 
+#' @importFrom pbapply pblapply
 ApplyNormalization <- function(data, 
                                scaling.method = c("TC", "UQ", "TMM", "DESeq", "PossionSeq"),
                                ruv.norm = TRUE, 
@@ -36,23 +38,25 @@ ApplyNormalization <- function(data,
   
   # scaling
   if (is.null(spike.in.prefix)) {
-    data.scaled <- lapply(scaling.method, function(i) {
-      norm.f <- get(paste0("norm", i)) 
+    cat("- Scaling... \n")
+    data.scale <- pbapply::pblapply(1:length(scaling.method), function(i) {
+      norm.f <- get(paste0("norm", scaling.method[i])) 
       data.norm <- norm.f(data)
     })
-    names(data.scaled) <- scaling.method
-    data.norm <- data.scaled
+    names(data.scale) <- scaling.method
+    data.norm <- data.scale
     data.raw <- list(dataNorm = data, normFactor = rep(1, ncol(data)))
     data.norm[["Raw"]] <- data.raw
   } else {
     data.spike.in <- data[grep(spike.in.prefix, rownames(data)),]
     data.non.spike.in <- data[grep(spike.in.prefix, rownames(data), invert = TRUE),]
     
-    data.scaled <- lapply(scaling.method, function(i) {
-      
-      norm.f <- get(paste0("norm", i)) 
+    cat("- Scaling... \n")
+    data.scale <- pbapply::pblapply(1:length(scaling.method), function(i) {
+      norm.f <- get(paste0("norm", scaling.method[i])) 
       data.norm.spike.in <- norm.f(data.spike.in)
       data.norm.non.spike.in <- norm.f(data.non.spike.in)
+      
       # return non-spike-in and negative control counts
       dataNorm <- rbind(data.norm.non.spike.in$dataNorm, data.norm.spike.in$dataNorm[control.idx,])
       
@@ -60,55 +64,56 @@ ApplyNormalization <- function(data,
         dataNorm = dataNorm,
         normFactor = data.norm.non.spike.in$normFactor
       ))
-      
     })
-    names(data.scaled) <- scaling.method
-    data.norm <- data.scaled
+    names(data.scale) <- scaling.method
+    data.norm <- data.scale
     data.raw <- list(dataNorm = data[c(grep(spike.in.prefix, rownames(data), invert=TRUE,value=TRUE),control.idx),],
                      normFactor = rep(1, ncol(data)))
     data.norm[["Raw"]] <- data.raw
   }
 
   # RUV normalization
-  if (ruv.norm) {
-    
+  if (ruv.norm & !is.null(control.idx)) {
     # stop when provided ruv.k larger than sample size
     if (ruv.k > ncol(data)) {
       stop("Number of `ruv.k` must not exceed the number of samples.")
     }
     
-    ruv.ls <- list()
-    for (i in names(data.norm)) {
-      data.curr <- data.norm[[i]]$dataNorm
-      for (k in 1:ruv.k) {
-        if (!is.null(control.idx)) {
-          ruv.ls[[paste0(i,"_RUVg_k",k)]] <- normRUV(data.curr,
-                                                     control.idx = control.idx,
-                                                     method = "RUVg",
-                                                     k = k, drop = ruv.drop)
-          ruv.ls[[paste0(i,"_RUVg_k",k)]]$normFactor <- data.norm[[i]]$normFactor
-          
-          if (!is.null(sc.idx)) {
-            ruv.ls[[paste0(i,"_RUVs_k",k)]] <- normRUV(data.curr,
-                                                       control.idx = control.idx,
-                                                       sc.idx = sc.idx,
-                                                       method = "RUVs",
-                                                       k = k, drop = ruv.drop)
-            ruv.ls[[paste0(i,"_RUVs_k",k)]]$normFactor <- data.norm[[i]]$normFactor
-          }
-          
-          if (!is.null(enrich.idx)) {
-            ruv.ls[[paste0(i,"_RUVse_k",k)]] <- normRUV(data.curr,
-                                                        control.idx = control.idx,
-                                                        sc.idx = enrich.idx,
-                                                        method = "RUVse",
-                                                        k = k, drop = ruv.drop)
-            ruv.ls[[paste0(i,"_RUVse_k",k)]]$normFactor <- data.norm[[i]]$normFactor
-            
-          }
-        }
-      }
+    cat("- Regression-based normalization... \n")
+    # generate all integrated methods
+    # only perform RUVs, when enrichment is the only covariate of interest
+    if (identical(sc.idx, enrich.idx)) {
+      integrated.methods <- paste(rep(paste(rep(c("Raw",scaling.method),each=2), c("RUVg","RUVs"), sep="_"), each=ruv.k), paste0("k", 1:ruv.k), sep="_")
+    } else {
+      integrated.methods <- paste(rep(paste(rep(c("Raw",scaling.method),each=3), c("RUVg","RUVs","RUVse"), sep="_"), each=ruv.k), paste0("k", 1:ruv.k), sep="_")
     }
+    
+    ruv.ls <- pbapply::pblapply(1:length(integrated.methods), function(i) {
+      # method.curr[1]: scaling; method.curr[2]: RUV; method.curr[3]: number of k
+      method.curr <- unlist(strsplit(integrated.methods[i], split = "_"))
+      
+      # get current scaled data and scaling factors
+      data.curr <- data.norm[[method.curr[1]]]$dataNorm
+      normFactor.curr <- data.norm[[method.curr[1]]]$normFactor
+      
+      # apply all RUV
+      if (method.curr[2] %in% c("RUVg", "RUVs", "RUVse")) {
+        # switch sc.idx
+        sc.idx <- switch(method.curr[2],
+                         "RUVg" = NULL,
+                         "RUVs" = sc.idx,
+                         "RUVse" = enrich.idx)
+        ruv.curr <- normRUV(data.curr,
+                            control.idx = control.idx,
+                            sc.idx = sc.idx,
+                            method = method.curr[2],
+                            k = as.numeric(gsub("k", "", method.curr[3])))
+        ruv.curr$normFactor <- normFactor.curr
+      }
+      return(ruv.curr)
+    })
+    names(ruv.ls) <- integrated.methods
+      
     data.norm <- c(data.norm, ruv.ls)
 
     # return only non-spike-in counts

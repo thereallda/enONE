@@ -25,6 +25,7 @@
 #' @importFrom cluster silhouette 
 #' @importFrom MatrixGenerics rowMedians colMedians colIQRs
 #' @importFrom fpc pamk
+#' @importFrom pbapply pblapply
 AssessNormalization <- function(data.ls, 
                                 bio.group = NULL, 
                                 enrich.group = NULL, 
@@ -35,8 +36,8 @@ AssessNormalization <- function(data.ls,
                                 pos.eval.set = NULL, 
                                 neg.eval.set = NULL) {
   
-  metrics.ls <- lapply(data.ls, function(x) {
-    data <- as.matrix(x$dataNorm)
+  metrics.ls <- pbapply::pblapply(1:length(data.ls), function(i) {
+    data <- as.matrix(data.ls[[i]]$dataNorm)
     # Clustering properties
     if (log) {
       data.log <- log2(data + 1)
@@ -104,7 +105,7 @@ AssessNormalization <- function(data.ls,
     } else {
       uv_cor <- 0
     }
-  
+    
     metrics <- c(
       BIO_SIM = bio_sil,
       EN_SIM = en_sil,
@@ -114,12 +115,13 @@ AssessNormalization <- function(data.ls,
       RLE_IQR = rle_iqr,
       WV_COR = wv_cor,
       UV_COR = uv_cor
-      )
+    )
   })
   
   # reduce list of metrics into table
   # with methods in row and measures in column
   metrics <- data.frame(do.call(rbind, metrics.ls))
+  rownames(metrics) <- names(data.ls)
   
   # multiplying by +/- 1 so that large values correspond to good performance
   score <- t(t(metrics) * c(1,1,-1,1,-1,-1,1,-1))  # BIO_SIM,EN_SIM,BATCH_SIM,PAM_SIM,RLE_MED,RLE_IQR,WV_COR,UV_COR

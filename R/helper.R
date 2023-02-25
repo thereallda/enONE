@@ -275,7 +275,6 @@ synEnrichment <- function(object, method="TC", log=TRUE) {
 #' @import dplyr
 #' @importFrom stats model.matrix
 #' @importFrom limma makeContrasts
-#' @importFrom rlang .data
 #' @importFrom tibble rownames_to_column
 #' @importFrom pbapply pblapply
 edgeRDE <- function(counts, 
@@ -304,7 +303,7 @@ edgeRDE <- function(counts,
   }
   
   # estimate dispersion and fit GLM with progress bar
-  cat("Estimate dispersion & Fit GLM... \n")
+  cat("- Estimate dispersion & Fit GLM... \n")
   
   de.ls1 <- pbapply::pblapply(1, function(i) {
     degs <- edgeR::estimateDisp(degs, design = design.mat)
@@ -315,8 +314,8 @@ edgeRDE <- function(counts,
   degs <- de.ls1[[1]]$degs
   fit.glm <- de.ls1[[1]]$fit.glm
   
-  # LRT 
-  cat("Testing differential genes... \n")
+  # Testing DEGs 
+  cat("- Testing differential genes... \n")
   if (is.null(coef) & !is.null(contrast.df)) {
     # construct contrast
     contrast.vec <- apply(contrast.df, 1, function(x) { paste(paste0("condition",x), collapse="-") })
@@ -675,8 +674,10 @@ DotPlot <- function(data, x, y, fill = NULL, palette = NULL) {
   
   dp <- dp +
     geom_dotplot(binaxis = "y", stackdir = "center", color = NA, 
-                 dotsize = 0.8, position = "dodge") +
-    stat_summary(fun.data = .mean_sd, size = 0.5, shape = 19, 
+                 dotsize = 0.6, position = "dodge") +
+    stat_summary(fun = mean, geom = "crossbar", width = 0.3, size = 0.3,
+                 position = position_dodge(width=0.9), show.legend = FALSE) +
+    stat_summary(fun.data = .mean_sd, width = 0.15, geom = "errorbar", size = 0.8,
                  position = position_dodge(width=0.9), show.legend = FALSE) +
     theme_classic() +
     theme(strip.background = element_blank()) +
