@@ -400,8 +400,9 @@ countReplicate <- function(group.vec) {
     names(curr.reps) <- curr.idx
     rep.vec <- c(rep.vec, curr.reps)
   }
-  rep.vec[sort(names(rep.vec))]
+  rep.vec <- rep.vec[as.character(sort(as.integer(names(rep.vec))))] # sort as input order
   names(rep.vec) <- NULL
+  return(rep.vec)
 }
 
 
