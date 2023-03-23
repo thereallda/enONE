@@ -170,7 +170,7 @@ For the regression-based procedures, `enONE` use three variants of RUV to estima
 
 > RUVse is a modification of RUVs. It estimated the factors of unwanted variation based on negative control genes from the replicate samples in each assay group (i.e., enrichment and input), for which the enrichment effect was assumed to be constant.
 
-All applied normalization methods can be assessed by `list`
+All applied normalization methods can be assessed by `listNormalization`
 
 ```{r}
 listNormalization(Enone)
@@ -230,7 +230,7 @@ PCA_Biplot(pca.eval, score = enScore$SCORE, interactive = FALSE)
 
 In this plot, each point corresponds to a normalization procedure and is colored by the performance score (mean of eight scone performance metric ranks). The blue arrows correspond to the PCA loadings for the performance metrics. The direction and length of a blue arrow can be interpreted as a measure of how much each metric contributed to the first two PCs
 
-Here, we use the top-ranked procedure DESeq_RUVs_k3 for downstream analysis.
+Here, we use the top-ranked procedure DESeq_RUVg_k2 for downstream analysis.
 
 ```{r}
 # select normalization

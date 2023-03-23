@@ -35,7 +35,7 @@ GeneSelection <- function(object,
   cat("Gene set selection for normalization and assessment...\n")
   ### 1. negative control genes for RUV
   cat(paste("- The number of negative control genes for normalization:",n.neg.control,"\n"))
-  designMat <- stats::model.matrix(~0+enrich.group)
+  #designMat <- stats::model.matrix(~0+enrich.group)
   deg.en <- edgeRDE(counts_sp,
                     group = enrich.group,
                     design.formula = stats::as.formula("~0+condition"),

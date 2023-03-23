@@ -395,11 +395,15 @@ countReplicate <- function(group.vec) {
   rep.vec <- vector("double")
   for (i in levels(group.vec)) {
     curr.group <- grep(i, group.vec, value = TRUE)
+    curr.idx <- grep(i, group.vec)
     curr.reps <- which(curr.group == i)
-    rep.vec <- c(rep.vec,curr.reps)
+    names(curr.reps) <- curr.idx
+    rep.vec <- c(rep.vec, curr.reps)
   }
-  rep.vec
+  rep.vec[sort(names(rep.vec))]
+  names(rep.vec) <- NULL
 }
+
 
 #' Combine list of DE results
 #'
@@ -479,6 +483,10 @@ PCAplot <- function(object, use.pc=c(1,2),
   colnames(map_df) <- names(var.ls)
   # combine with pca_dat if not empty
   if (!any(dim(map_df) == 0)) {
+    # re-assign class
+    for (i in 1:ncol(map_df)) {
+      class(map_df[,i]) <- class(var.ls[[i]])
+    }
     pca_dat <- cbind(pca_dat, map_df)
   }
   
@@ -502,11 +510,17 @@ PCAplot <- function(object, use.pc=c(1,2),
     theme(panel.grid = element_blank(),
           legend.position = "top",
           axis.text = element_text(color="black")) +
-    scale_color_manual(values = palette) +
     labs(x=paste0(use.pc[1], ": ", pc.var[ use.pc[1] ]*100, "%"),
          y=paste0(use.pc[2], ": ", pc.var[ use.pc[2] ]*100, "%"),
          title=title)
   
+  # tune color
+  if (is.character(color)) {
+    p <- p + scale_color_manual(values = palette)
+  } else if (is.numeric(color)) {
+    p <- p + scale_color_gradientn(colors = palette)
+  }
+
   # add text label
   if (!is.null(label)) {
     if (repel) {
