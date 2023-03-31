@@ -60,10 +60,10 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getGeneSet</span><span class="op">(</span><span class="va">object</span>, <span class="va">name</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getGeneSet</span><span class="op">(</span><span class="va">object</span>, name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NegControl"</span>, <span class="st">"NegEvaluation"</span>, <span class="st">"PosEvaluation"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for Enone,character</span></span>
-<span><span class="fu">getGeneSet</span><span class="op">(</span><span class="va">object</span>, <span class="va">name</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">getGeneSet</span><span class="op">(</span><span class="va">object</span>, name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"NegControl"</span>, <span class="st">"NegEvaluation"</span>, <span class="st">"PosEvaluation"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -73,7 +73,8 @@
 
 
 <dt>name</dt>
-<dd><p>Name of the gene set, must be the same as the column names of <code>rowData(Enone)</code>.</p></dd>
+<dd><p>Name of the gene set, one of <code>NegControl</code>,
+<code>NegEvaluation</code>, or <code>PosEvaluation</code></p></dd>
 
 </dl></div>
     <div class="section level2">
