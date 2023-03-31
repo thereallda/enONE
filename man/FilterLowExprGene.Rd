@@ -7,7 +7,7 @@
 FilterLowExprGene(x, group = NULL, min.count = 10)
 }
 \arguments{
-\item{x}{Enone object}
+\item{x}{Input data, can be counts matrix or Enone object.}
 
 \item{group}{Vector or factor giving group membership for a oneway layout,
 if appropriate, default: NULL.}
@@ -15,7 +15,7 @@ if appropriate, default: NULL.}
 \item{min.count}{Minimum count required for at least some samples, default: 10.}
 }
 \value{
-updated Enone object
+Filtered count matrix or updated Enone object.
 }
 \description{
 Filter Low Expressed Genes

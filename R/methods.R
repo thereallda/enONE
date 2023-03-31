@@ -134,7 +134,8 @@ setMethod("getParameter", signature = signature(object="Enone", name="character"
 #' Get gene set. 
 #'  
 #' @param object Enone. 
-#' @param name Name of the gene set, must be the same as the column names of \code{rowData(Enone)}.
+#' @param name Name of the gene set, one of \code{NegControl}, 
+#' \code{NegEvaluation}, or \code{PosEvaluation}
 #' @name getGeneSet
 #' @aliases getGeneSet getGeneSet,Enone,character-method
 #' 
@@ -144,7 +145,7 @@ setMethod("getParameter", signature = signature(object="Enone", name="character"
 setMethod("getGeneSet", signature = signature(object="Enone", name="character"),
           function(object, name) {
             
-            if (!name %in% colnames(SummarizedExperiment::rowData(object))) {
+            if (!name %in% c("NegControl","NegEvaluation","PosEvaluation")) {
               stop(name, "not presented in data.")
             }
             

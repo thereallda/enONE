@@ -5,14 +5,15 @@
 \alias{getGeneSet,Enone,character-method}
 \title{Accessor of gene set}
 \usage{
-getGeneSet(object, name)
+getGeneSet(object, name = c("NegControl", "NegEvaluation", "PosEvaluation"))
 
-\S4method{getGeneSet}{Enone,character}(object, name)
+\S4method{getGeneSet}{Enone,character}(object, name = c("NegControl", "NegEvaluation", "PosEvaluation"))
 }
 \arguments{
 \item{object}{Enone.}
 
-\item{name}{Name of the gene set, must be the same as the column names of \code{rowData(Enone)}.}
+\item{name}{Name of the gene set, one of \code{NegControl},
+\code{NegEvaluation}, or \code{PosEvaluation}}
 }
 \value{
 Vector of gene ID

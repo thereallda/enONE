@@ -32,7 +32,7 @@ setGeneric("getParameter", function(object, name) standardGeneric("getParameter"
 
 #' @rdname getGeneSet
 #' @export
-setGeneric("getGeneSet", function(object, name) standardGeneric("getGeneSet"))
+setGeneric("getGeneSet", function(object, name=c("NegControl","NegEvaluation","PosEvaluation")) standardGeneric("getGeneSet"))
 
 #' @rdname getEnrichment
 #' @export

@@ -2,7 +2,8 @@
 #'
 #' @param object An object.
 #' @param slot Which slot, one of \code{sample} or \code{spike_in}.  
-#' @param method Which normalization methods, must be one of the methods presented in the selected slot.  
+#' @param method Which normalization method to use for differential analysis, 
+#' must be one of the methods presented in the selected slot.  
 #' @param logfc.cutoff Filter genes by at least X-fold difference (log2-scale) 
 #' between the two groups of samples, default: 1. 
 #' @param p.cutoff Filter genes by no more than \code{p.cutoff} adjusted p-value, default: 0.05. 
@@ -14,7 +15,7 @@
 #' @return updated Enone 
 #' @export
 #'
-FindEnrichment <-  function(object, slot=c("sample","spike_in"), method, 
+FindEnrichment <- function(object, slot=c("sample","spike_in"), method, 
                             logfc.cutoff=1, p.cutoff=0.05, ...) {
   
   contrast_df <- data.frame(Group1 = unique(grep(object@parameter$enrich.id, object$condition, value = TRUE)),
@@ -430,6 +431,83 @@ reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
   return(df)
 }
 
+#' Filter Low Expressed Genes
+#'
+#' @param x Input data, can be counts matrix or Enone object.
+#' @param group Vector or factor giving group membership for a oneway layout,
+#' if appropriate, default: NULL.
+#' @param min.count Minimum count required for at least some samples, default: 10.
+#'
+#' @return Filtered count matrix or updated Enone object.
+#' @export
+#'
+FilterLowExprGene <- function(x, group=NULL, min.count=10) {
+  # get counts
+  if (is.matrix(x)){
+    data <- as.matrix(x)
+  }
+  
+  if (class(x) %in% "Enone") {
+    data <- x@assays@data@listData[[1]]
+  }
+  
+  # size of minimum samples
+  if (is.null(group)) {
+    min_sample <- ncol(data)
+  } else {
+    group <- as.factor(group)
+    n_sample <- tabulate(group)
+    min_sample <- min(n_sample[n_sample > 0])
+  }
+  
+  # filter low genes
+  keep <- rowSums(data >= min.count) >= min_sample
+  x <- x[keep, ]
+  return(x)
+}
+
+#' Outlier Test
+#' 
+#' @description Rosner’s outlier test on principal component 1 to assess and 
+#' remove potential outliers.
+#'
+#' @param x Enone object
+#' @param return Whether to return object or simply perform test, default FALSE
+#' @param remove Whether to remove outliers. If TRUE, must be paired with 
+#' "return=TRUE", default: FALSE
+#'
+#' @return updated Enone object
+#' @export
+#'
+#' @importFrom DESeq2 vst
+#' @importFrom EnvStats rosnerTest
+OutlierTest <- function(x, return=FALSE, remove=FALSE) {
+  # get counts
+  data <- as.matrix(x@assays@data@listData[[1]])
+  
+  # variance stabilizing transformation
+  vt <- DESeq2::vst(data)
+  
+  # pricipal component analysis
+  pc <- prcomp(t(vt))
+  
+  # Rosner’s outlier test on principal component 1
+  test <- EnvStats::rosnerTest(pc$x[,1])$all.stats
+  
+  if (sum(test$Outlier) > 0 & return & remove) {
+    outlier.idx <- test[test$Outlier == TRUE, ]$Obs.Num
+    x <- x[, -outlier.idx]
+  }
+  
+  # print test message
+  cat("Rosner's outlier test\n")
+  print(test)
+  
+  if (return) {
+    return(x)
+  }
+}
+
 ##--Visualization--##
 
 #' PCA plot from counts matrix
@@ -715,84 +793,12 @@ DotPlot <- function(data, x, y, fill = NULL, palette = NULL) {
   return(c(y=m, ymin=ymin, ymax=ymax))
 }
 
-#' Filter Low Expressed Genes
-#'
-#' @param x Enone object
-#' @param group Vector or factor giving group membership for a oneway layout, 
-#' if appropriate, default: NULL. 
-#' @param min.count Minimum count required for at least some samples, default: 10. 
-#'
-#' @return updated Enone object
-#' @export
-#'
-FilterLowExprGene <- function(x, group=NULL, min.count=10) {
-  # get counts
-  data <- x@assays@data@listData[[1]]
-  
-  # size of minimum samples
-  if (is.null(group)) {
-    min_sample <- ncol(data)
-  } else {
-    group <- as.factor(group)
-    n_sample <- tabulate(group)
-    min_sample <- min(n_sample[n_sample > 0])
-  }
-  
-  # filter low genes
-  keep <- rowSums(data >= min.count) >= min_sample
-  x <- x[keep, ]
-  return(x)
-  
-}
-
-#' Outlier Test
-#' 
-#' @description Rosner’s outlier test on principal component 1 to assess and 
-#' remove potential outliers.
-#'
-#' @param x Enone object
-#' @param return Whether to return object or simply perform test, default FALSE
-#' @param remove Whether to remove outliers. If TRUE, must be paired with 
-#' "return=TRUE", default: FALSE
-#'
-#' @return updated Enone object
-#' @export
-#'
-#' @importFrom DESeq2 vst
-#' @importFrom EnvStats rosnerTest
-OutlierTest <- function(x, return=FALSE, remove=FALSE) {
-  # get counts
-  data <- as.matrix(x@assays@data@listData[[1]])
-  
-  # variance stabilizing transformation
-  vt <- DESeq2::vst(data)
-  
-  # pricipal component analysis
-  pc <- prcomp(t(vt))
-  
-  # Rosner’s outlier test on principal component 1
-  test <- EnvStats::rosnerTest(pc$x[,1])$all.stats
-  
-  if (sum(test$Outlier) > 0 & return & remove) {
-    outlier.idx <- test[test$Outlier == TRUE, ]$Obs.Num
-    x <- x[, -outlier.idx]
-  }
-  
-  # print test message
-  cat("Rosner's outlier test\n")
-  print(test)
-  
-  if (return) {
-    return(x)
-  }
-}
-
 # For adjusting no visible binding
 ## reduceRes
 utils::globalVariables(c("GeneID", "Group"))
-## ggPCA
+## PCAplot
 utils::globalVariables(c("PC1", "PC2", "group"))
-## ggPCA_Biplot
+## PCA_Biplot
 utils::globalVariables(c("Performance", "method.id"))
 ## edgeRDE
 utils::globalVariables(c("rowname"))
