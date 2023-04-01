@@ -116,7 +116,7 @@ The main `enONE` function can be used to perform gene selection, normalization, 
 ```{r}
 Enone <- enONE(Enone, 
                scaling.method = c("TC", "UQ", "TMM", "DESeq", "PossionSeq"),
-               ruv.norm = TRUE, ruv.k = 3,
+               ruv.norm = TRUE, ruv.k = 1,
                eval.pam.k = 2:6, eval.pc.n = 3, 
                return.norm = TRUE
                )
@@ -137,7 +137,7 @@ Gene set selection can either be automatically defined in `enONE` function with 
 Selected gene sets can be assessed by `getGeneSet` with the name of gene set (i.e., `"NegControl"`, `"NegEvaluation"`, `"PosEvaluation"`).
 
 ```{r}
-getGeneSet(Enone, "NegControl")[1:5]
+getGeneSet(Enone, name = "NegControl")[1:5]
 ```
 
 #### Normalization
@@ -294,7 +294,7 @@ Use `getEnrichment` to retrieve a list of enrichment result tables.
 
 ```{r}
 # find all enriched genes
-Enone <- FindEnrichment(Enone, slot="sample", method = norm.method, 
+Enone <- FindEnrichment(Enone, slot="sample", norm.method = norm.method, 
                         logfc.cutoff = 1, p.cutoff = 0.05)
 
 # get filtered enrichment results

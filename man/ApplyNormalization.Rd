@@ -13,7 +13,8 @@ ApplyNormalization(
   control.idx = NULL,
   sc.idx = NULL,
   enrich.idx = NULL,
-  spike.in.prefix = NULL
+  spike.in.prefix = NULL,
+  synthetic.id = NULL
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ The first row is the column index of input and the second row is the
 column index of enrichment samples.}
 
 \item{spike.in.prefix}{A character specify the prefix of spike-in id.}
+
+\item{synthetic.id}{Character or vector of string specifying the name of synthetic RNAs.}
 }
 \value{
 List of objects containing normalized data and associated normalization factors.

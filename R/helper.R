@@ -2,11 +2,12 @@
 #'
 #' @param object An object.
 #' @param slot Which slot, one of \code{sample} or \code{spike_in}.  
-#' @param method Which normalization method to use for differential analysis, 
+#' @param norm.method Which normalization method to use for differential analysis, 
 #' must be one of the methods presented in the selected slot.  
 #' @param logfc.cutoff Filter genes by at least X-fold difference (log2-scale) 
 #' between the two groups of samples, default: 1. 
 #' @param p.cutoff Filter genes by no more than \code{p.cutoff} adjusted p-value, default: 0.05. 
+#' @param only.pos Whether significant differential genes only consider genes with positive fold-change.
 #' @param ... Additional parameters can be passed to \code{edgeRDE}. 
 #' 
 #' @name FindEnrichment 
@@ -15,8 +16,8 @@
 #' @return updated Enone 
 #' @export
 #'
-FindEnrichment <- function(object, slot=c("sample","spike_in"), method, 
-                            logfc.cutoff=1, p.cutoff=0.05, ...) {
+FindEnrichment <- function(object, slot=c("sample","spike_in"), norm.method, 
+                            logfc.cutoff=1, p.cutoff=0.05, only.pos=TRUE, ...) {
   
   contrast_df <- data.frame(Group1 = unique(grep(object@parameter$enrich.id, object$condition, value = TRUE)),
                             Group2 = unique(grep(object@parameter$input.id, object$condition, value = TRUE)))
@@ -27,7 +28,7 @@ FindEnrichment <- function(object, slot=c("sample","spike_in"), method,
   if (is.null(names(object@enone_factor[[slot]]))) {
     stop("Normalizations for ", slot, " not found. At least one normalization should be performed.")
   }
-  method <- match.arg(method, choices = names(object@enone_factor[[slot]]))
+  norm.method <- match.arg(norm.method, choices = names(object@enone_factor[[slot]]))
   
   if (slot == "spike_in") {
     counts_df <- SummarizedExperiment::assay(object)[SummarizedExperiment::rowData(object)$SpikeIn,]
@@ -40,7 +41,7 @@ FindEnrichment <- function(object, slot=c("sample","spike_in"), method,
   }
   
   # get list of factors 
-  factor.ls <- getFactor(object, slot=slot, method=method)
+  factor.ls <- getFactor(object, slot=slot, method=norm.method)
   if ( !is.null(factor.ls[["normFactor"]]) ) {
     if ( !is.null(factor.ls[["adjustFactor"]]) ) {
       # if norm factors and adjust factors were both provided
@@ -442,12 +443,11 @@ reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
 #' @export
 #'
 FilterLowExprGene <- function(x, group=NULL, min.count=10) {
-  # get counts
-  if (is.matrix(x)){
-    data <- as.matrix(x)
-  }
   
-  if (class(x) %in% "Enone") {
+  # get counts
+  if (is.matrix(x)) {
+    data <- as.matrix(x)
+  } else if ("Enone" %in% as.character(class(x))) {
     data <- x@assays@data@listData[[1]]
   }
   
@@ -463,6 +463,11 @@ FilterLowExprGene <- function(x, group=NULL, min.count=10) {
   # filter low genes
   keep <- rowSums(data >= min.count) >= min_sample
   x <- x[keep, ]
+  
+  if ("Enone" %in% as.character(class(x))) {
+    x <- .keepConsRows(x)
+  }
+  
   return(x)
 }
 
@@ -506,6 +511,40 @@ OutlierTest <- function(x, return=FALSE, remove=FALSE) {
   if (return) {
     return(x)
   }
+}
+
+#' Keep Consistent Rows in Object
+#' 
+#' @description Make sure the rows in `counts` slot and `assay` are consistent.
+#' 
+#' @param object Enone object
+#'
+#' @return Updated Enone
+#'
+.keepConsRows <- function(object) {
+  # get parameters
+  spike.in.prefix <- object@parameter$spike.in.prefix
+  synthetic.id <- object@parameter$synthetic.id
+  
+  # get counts
+  data <- SummarizedExperiment::assay(object)
+  data_sam <- data[grep(paste(c(spike.in.prefix, synthetic.id), collapse = "|"), rownames(data), invert = TRUE),] # data from samples
+  data_sp <- data[grep(spike.in.prefix, rownames(data)),] # data from spike-in
+  
+  # keep consistent rows in `counts` slot and assay
+  if (!all(rownames(data_sp) %in% rownames(data))) {
+    data_sp <- data_sp[intersect(rownames(data_sp), rownames(data)), ]
+  }
+  
+  if (!all(rownames(data_sam) %in% rownames(data))) {
+    data_sam <- data_sam[intersect(rownames(data_sam), rownames(data)), ]
+  }
+  
+  object@counts$sample[["Raw"]] <- data_sam
+  object@counts$spike_in[["Raw"]] <- data_sp
+  
+  validObject(object)
+  return(object)
 }
 
 ##--Visualization--##

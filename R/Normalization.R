@@ -17,6 +17,7 @@
 #'   The first row is the column index of input and the second row is the 
 #'   column index of enrichment samples.
 #' @param spike.in.prefix A character specify the prefix of spike-in id. 
+#' @param synthetic.id Character or vector of string specifying the name of synthetic RNAs.  
 #' 
 #' @return List of objects containing normalized data and associated normalization factors. 
 #' @export
@@ -30,7 +31,8 @@ ApplyNormalization <- function(data,
                                control.idx = NULL,
                                sc.idx = NULL,
                                enrich.idx = NULL,
-                               spike.in.prefix = NULL) {
+                               spike.in.prefix = NULL,
+                               synthetic.id = NULL) {
   
   scaling.method <- match.arg(scaling.method,
                       choices = c("TC", "UQ", "TMM", "DESeq", "PossionSeq"),
@@ -49,7 +51,7 @@ ApplyNormalization <- function(data,
     data.norm[["Raw"]] <- data.raw
   } else {
     data.spike.in <- data[grep(spike.in.prefix, rownames(data)),]
-    data.non.spike.in <- data[grep(spike.in.prefix, rownames(data), invert = TRUE),]
+    data.non.spike.in <- data[grep(paste(c(spike.in.prefix, synthetic.id), collapse = "|"), rownames(data), invert = TRUE),]
     
     cat("- Scaling... \n")
     data.scale <- pbapply::pblapply(1:length(scaling.method), function(i) {

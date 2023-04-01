@@ -8,9 +8,10 @@
 FindEnrichment(
   object,
   slot = c("sample", "spike_in"),
-  method,
+  norm.method,
   logfc.cutoff = 1,
   p.cutoff = 0.05,
+  only.pos = TRUE,
   ...
 )
 }
@@ -19,13 +20,15 @@ FindEnrichment(
 
 \item{slot}{Which slot, one of \code{sample} or \code{spike_in}.}
 
-\item{method}{Which normalization method to use for differential analysis,
+\item{norm.method}{Which normalization method to use for differential analysis,
 must be one of the methods presented in the selected slot.}
 
 \item{logfc.cutoff}{Filter genes by at least X-fold difference (log2-scale)
 between the two groups of samples, default: 1.}
 
 \item{p.cutoff}{Filter genes by no more than \code{p.cutoff} adjusted p-value, default: 0.05.}
+
+\item{only.pos}{Whether significant differential genes only consider genes with positive fold-change.}
 
 \item{...}{Additional parameters can be passed to \code{edgeRDE}.}
 }

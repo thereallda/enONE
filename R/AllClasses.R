@@ -109,6 +109,11 @@ createEnone <- function(data,
                        enrichment_filtered = enrichment_filtered_assay,
                        parameter = params
                        )
+  
+  # separate the raw counts
+  Enone@counts$sample[["Raw"]] <- data[grep(paste(c(spike.in.prefix, synthetic.id), collapse = "|"), rownames(data), invert = TRUE),]
+  Enone@counts$spike_in[["Raw"]] <- data[grep(spike.in.prefix, rownames(data)),]
+  
   validObject(Enone)
   return(Enone)
 }
@@ -144,5 +149,4 @@ setValidity("Enone", function(object) {
   if (!all(is.na(object$batch)) & length(object$batch) != ncol(object)) {
     return("The number of elements in `batch.group` does not match the sample size.")
   }
-  
 })

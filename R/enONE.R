@@ -58,7 +58,7 @@ enONE <- function(object,
   # get counts
   data <- SummarizedExperiment::assay(object)
   # sample counts
-  counts_nsp <- data[grep(spike.in.prefix, rownames(data), invert = TRUE),]
+  counts_nsp <- data[grep(paste(c(spike.in.prefix, synthetic.id), collapse = "|"), rownames(data), invert = TRUE),]
   # spike-in counts
   counts_sp <- data[grep(spike.in.prefix, rownames(data)),]
   
@@ -106,6 +106,7 @@ enONE <- function(object,
                                 scaling.method = scaling.method, 
                                 ruv.norm = ruv.norm, ruv.k = ruv.k, ruv.drop = ruv.drop,
                                 spike.in.prefix = spike.in.prefix,
+                                synthetic.id = synthetic.id,
                                 # below parameters are generated inside enONE function
                                 control.idx = neg.control.set, 
                                 sc.idx = sc_mat, 
@@ -170,5 +171,6 @@ enONE <- function(object,
       }
   } 
   
+  validObject(object)
   return(object)
 }
