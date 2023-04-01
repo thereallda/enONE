@@ -285,7 +285,7 @@ respectively.</p>
 the name of gene set (i.e., <code>"NegControl"</code>,
 <code>"NegEvaluation"</code>, <code>"PosEvaluation"</code>).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/getGeneSet.html">getGeneSet</a></span><span class="op">(</span><span class="va">Enone</span>, <span class="st">"NegControl"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/getGeneSet.html">getGeneSet</a></span><span class="op">(</span><span class="va">Enone</span>, name <span class="op">=</span> <span class="st">"NegControl"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
 <span><span class="co">#&gt; [1] "FBgn0031247" "FBgn0031255" "FBgn0004583" "FBgn0031324" "FBgn0026397"</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -353,12 +353,12 @@ effect was assumed to be constant.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/Counts.html">Counts</a></span><span class="op">(</span><span class="va">Enone</span>, slot<span class="op">=</span><span class="st">"sample"</span>, method<span class="op">=</span><span class="st">"DESeq_RUVg_k2"</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                        D1        D2        D3        D4        D5</span></span>
-<span><span class="co">#&gt; ENSG00000227232  8.513191 11.644149 12.430311  7.452931 11.103087</span></span>
-<span><span class="co">#&gt; ENSG00000268903  3.305178  8.099601  5.277247 26.323356  7.087624</span></span>
-<span><span class="co">#&gt; ENSG00000269981  2.270170  4.876260  2.402558 18.116461  6.067605</span></span>
-<span><span class="co">#&gt; ENSG00000279457 11.894618  9.997839  8.759756 11.203303 16.374378</span></span>
-<span><span class="co">#&gt; ENSG00000225630 13.766308 16.291397 15.364064 10.139363 17.832904</span></span>
-<span><span class="co">#&gt; ENSG00000237973 28.039373 37.273703 39.843934 34.075036 33.948773</span></span></code></pre></div>
+<span><span class="co">#&gt; ENSG00000227232  8.513936 11.645203 12.431441  7.453572 11.104087</span></span>
+<span><span class="co">#&gt; ENSG00000268903  3.305409  8.100305  5.277670 26.325845  7.088225</span></span>
+<span><span class="co">#&gt; ENSG00000269981  2.270299  4.876642  2.402698 18.118129  6.068101</span></span>
+<span><span class="co">#&gt; ENSG00000279457 11.895695  9.998730  8.760526 11.204313 16.375896</span></span>
+<span><span class="co">#&gt; ENSG00000225630 13.767575 16.292915 15.365490 10.140265 17.834578</span></span>
+<span><span class="co">#&gt; ENSG00000237973 28.042040 37.277287 39.847772 34.078301 33.952026</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="evaluation">Evaluation<a class="anchor" aria-label="anchor" href="#evaluation"></a>
@@ -406,33 +406,33 @@ of RLE. Low values of <code>RLE_IQR</code> is desirable.</p></li>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getMetrics.html">getMetrics</a></span><span class="op">(</span><span class="va">Enone</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
 <span><span class="co">#&gt;                        BIO_SIM    EN_SIM   BATCH_SIM   PAM_SIM      RLE_MED</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k2      -0.02461292 0.3576753 -0.03480360 0.5713525 9.252390e-06</span></span>
-<span><span class="co">#&gt; TMM_RUVg_k2        -0.02659701 0.3518560 -0.03522449 0.5595757 8.539606e-05</span></span>
-<span><span class="co">#&gt; PossionSeq_RUVs_k3  0.10244399 0.3374932 -0.04090358 0.5556241 1.016854e-04</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k3      -0.04646875 0.3485360 -0.04421692 0.5708959 1.362341e-05</span></span>
-<span><span class="co">#&gt; DESeq_RUVs_k1       0.03359309 0.3389217 -0.04403183 0.5228395 7.804449e-06</span></span>
+<span><span class="co">#&gt; DESeq_RUVg_k2      -0.02467593 0.3576650 -0.03483061 0.5713398 9.319387e-06</span></span>
+<span><span class="co">#&gt; PossionSeq_RUVs_k3  0.10240479 0.3374029 -0.03965069 0.5556398 9.971803e-05</span></span>
+<span><span class="co">#&gt; TMM_RUVg_k2        -0.02664678 0.3518415 -0.03524885 0.5595637 8.500478e-05</span></span>
+<span><span class="co">#&gt; DESeq_RUVg_k3      -0.04651463 0.3485155 -0.04427468 0.5708689 1.370353e-05</span></span>
+<span><span class="co">#&gt; DESeq_RUVs_k1       0.03352455 0.3391415 -0.04444996 0.5224180 7.861089e-06</span></span>
 <span><span class="co">#&gt;                        RLE_IQR    WV_COR    UV_COR</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k2      0.011995537 0.7402359 0.3257564</span></span>
-<span><span class="co">#&gt; TMM_RUVg_k2        0.012090742 0.7405448 0.3287862</span></span>
-<span><span class="co">#&gt; PossionSeq_RUVs_k3 0.012339803 0.7695275 0.3151764</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k3      0.011135265 0.6688767 0.4165558</span></span>
-<span><span class="co">#&gt; DESeq_RUVs_k1      0.009161458 0.6492389 0.3672002</span></span></code></pre></div>
+<span><span class="co">#&gt; DESeq_RUVg_k2      0.011996148 0.7401496 0.3258051</span></span>
+<span><span class="co">#&gt; PossionSeq_RUVs_k3 0.012314397 0.7709943 0.3154878</span></span>
+<span><span class="co">#&gt; TMM_RUVg_k2        0.012089861 0.7404610 0.3288269</span></span>
+<span><span class="co">#&gt; DESeq_RUVg_k3      0.011133971 0.6688187 0.4166522</span></span>
+<span><span class="co">#&gt; DESeq_RUVs_k1      0.009145155 0.6495402 0.3680677</span></span></code></pre></div>
 <p>Evaluation score is the average rank of each performance metrics,
 which can be assessed by <code>getScore</code></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getScore.html">getScore</a></span><span class="op">(</span><span class="va">Enone</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="op">]</span></span>
 <span><span class="co">#&gt;                    BIO_SIM EN_SIM BATCH_SIM PAM_SIM RLE_MED RLE_IQR WV_COR</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k2           32     59        41      59      56      25     20</span></span>
-<span><span class="co">#&gt; TMM_RUVg_k2             30     50        43      54      39      24     21</span></span>
-<span><span class="co">#&gt; PossionSeq_RUVs_k3      60     22        48      50      33      23     23</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k3           21     49        54      58      54      29     12</span></span>
-<span><span class="co">#&gt; DESeq_RUVs_k1           56     31        52      26      57      32      3</span></span>
+<span><span class="co">#&gt; DESeq_RUVg_k2           32     59        40      59      56      25     20</span></span>
+<span><span class="co">#&gt; PossionSeq_RUVs_k3      60     23        47      50      33      23     23</span></span>
+<span><span class="co">#&gt; TMM_RUVg_k2             30     50        42      54      39      24     21</span></span>
+<span><span class="co">#&gt; DESeq_RUVg_k3           20     48        53      58      54      29     12</span></span>
+<span><span class="co">#&gt; DESeq_RUVs_k1           55     32        54      25      57      32      5</span></span>
 <span><span class="co">#&gt;                    UV_COR  SCORE</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k2          59 43.875</span></span>
-<span><span class="co">#&gt; TMM_RUVg_k2            58 39.875</span></span>
+<span><span class="co">#&gt; DESeq_RUVg_k2          59 43.750</span></span>
 <span><span class="co">#&gt; PossionSeq_RUVs_k3     60 39.875</span></span>
-<span><span class="co">#&gt; DESeq_RUVg_k3          39 39.500</span></span>
-<span><span class="co">#&gt; DESeq_RUVs_k1          53 38.750</span></span></code></pre></div>
+<span><span class="co">#&gt; TMM_RUVg_k2            58 39.750</span></span>
+<span><span class="co">#&gt; DESeq_RUVg_k3          39 39.125</span></span>
+<span><span class="co">#&gt; DESeq_RUVs_k1          52 39.000</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -509,7 +509,9 @@ normalization.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"After normalization"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># combine two plots</span></span>
-<span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span></code></pre></div>
+<span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span></span>
+<span><span class="co">#&gt; Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider</span></span>
+<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre></div>
 <p><img src="enONE_tutorial_files/figure-html/unnamed-chunk-15-1.png" width="1152"></p>
 </div>
 <div class="section level2">
@@ -530,7 +532,7 @@ in input samples.</p>
 result tables.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># find all enriched genes</span></span>
-<span><span class="va">Enone</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindEnrichment.html">FindEnrichment</a></span><span class="op">(</span><span class="va">Enone</span>, slot<span class="op">=</span><span class="st">"sample"</span>, method <span class="op">=</span> <span class="va">norm.method</span>, </span>
+<span><span class="va">Enone</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindEnrichment.html">FindEnrichment</a></span><span class="op">(</span><span class="va">Enone</span>, slot<span class="op">=</span><span class="st">"sample"</span>, norm.method <span class="op">=</span> <span class="va">norm.method</span>, </span>
 <span>                        logfc.cutoff <span class="op">=</span> <span class="fl">1</span>, p.cutoff <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="co">#&gt; - Estimate dispersion &amp; Fit GLM... </span></span>
 <span><span class="co">#&gt; - Testing differential genes...</span></span>
@@ -566,12 +568,12 @@ method is applied.</li>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res.sig.ls</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            GeneID    logFC   logCPM       LR        PValue           FDR</span></span>
-<span><span class="co">#&gt; 1 ENSG00000013275 2.272071 7.518248 732.1665 3.027700e-161 4.187309e-157</span></span>
-<span><span class="co">#&gt; 2 ENSG00000113387 2.643445 9.732201 632.0043 1.831945e-139 1.266790e-135</span></span>
-<span><span class="co">#&gt; 3 ENSG00000104853 2.244864 7.839309 588.0558 6.634253e-130 3.058391e-126</span></span>
-<span><span class="co">#&gt; 4 ENSG00000105185 2.094523 6.147943 558.6765 1.631268e-123 5.640108e-120</span></span>
-<span><span class="co">#&gt; 5 ENSG00000143110 3.084632 9.116028 550.2734 1.097768e-121 3.036425e-118</span></span>
-<span><span class="co">#&gt; 6 ENSG00000173915 2.325200 7.005518 484.0091 2.866741e-107 6.607839e-104</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 ENSG00000013275 2.271643 7.518198 731.6422 3.936608e-161 5.444329e-157</span></span>
+<span><span class="co">#&gt; 2 ENSG00000113387 2.643018 9.732157 631.6712 2.164465e-139 1.496728e-135</span></span>
+<span><span class="co">#&gt; 3 ENSG00000104853 2.244442 7.839256 587.7484 7.738626e-130 3.567507e-126</span></span>
+<span><span class="co">#&gt; 4 ENSG00000105185 2.094086 6.147852 558.6392 1.662061e-123 5.746574e-120</span></span>
+<span><span class="co">#&gt; 5 ENSG00000143110 3.084209 9.115976 550.0416 1.232914e-121 3.410239e-118</span></span>
+<span><span class="co">#&gt; 6 ENSG00000173915 2.324782 7.005478 483.7653 3.239173e-107 7.466295e-104</span></span></code></pre></div>
 <p>To convert list of enrichment result tables into data frame in long
 format, <code>enONE</code> package provide <code>reduceRes</code>
 function for this task. Finally, you can use
@@ -718,7 +720,7 @@ no enrichment is found for Syn2 made up with 100% m7G-RNA.</p>
 <span><span class="co">#&gt;  [99] pillar_1.9.0                KEGGREST_1.38.0            </span></span>
 <span><span class="co">#&gt; [101] abind_1.4-5                 RCurl_1.98-1.12            </span></span>
 <span><span class="co">#&gt; [103] nnet_7.3-18                 crayon_1.5.2               </span></span>
-<span><span class="co">#&gt; [105] car_3.1-1                   utf8_1.2.3                 </span></span>
+<span><span class="co">#&gt; [105] car_3.1-2                   utf8_1.2.3                 </span></span>
 <span><span class="co">#&gt; [107] plotly_4.10.1               tzdb_0.3.0                 </span></span>
 <span><span class="co">#&gt; [109] rmarkdown_2.21              locfit_1.5-9.7             </span></span>
 <span><span class="co">#&gt; [111] grid_4.2.3                  data.table_1.14.8          </span></span>
