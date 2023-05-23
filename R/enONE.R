@@ -36,6 +36,11 @@ enONE <- function(object,
                   ruv.norm = TRUE, ruv.k = 1, ruv.drop = 0,
                   eval.pam.k = 2:6, eval.pc.n = 3) {
   
+  # check ruv.k, eval.pam.k and eval.pc.n are least than the number of samples
+  if (!all(c(ruv.k, eval.pam.k, eval.pc.n) < ncol(object))) {
+    stop("Number of `ruv.k`, `eval.pam.k` and `eval.pc.n` should not exceed the number of samples.")
+  }
+  
   # retrieve parameters from Enone object
   bio.group <- object$condition
   enrich.group <- object$enrich

@@ -445,7 +445,7 @@ reduceRes <- function(res.ls, logfc.col, levels=names(res.ls)) {
 FilterLowExprGene <- function(x, group=NULL, min.count=10) {
   
   # get counts
-  if (is.matrix(x)) {
+  if (is.matrix(x) | is.data.frame(x)) { #TODO: signature for S3
     data <- as.matrix(x)
   } else if ("Enone" %in% as.character(class(x))) {
     data <- x@assays@data@listData[[1]]
@@ -609,7 +609,7 @@ PCAplot <- function(object, use.pc=c(1,2),
   }
   
   # generate color palette
-  if (is.null(palette)) {
+  if (!is.null(color) & is.null(palette)) {
     palette <- paintingr::paint_palette("Spring", length(unique(pca_dat$color)), "continuous")
   }
   
@@ -621,9 +621,9 @@ PCAplot <- function(object, use.pc=c(1,2),
   mapping <- do.call(ggplot2::aes_string, map_ls)
   
   p <- ggplot(pca_dat, mapping) +
-    geom_point(size=3) +
     geom_vline(xintercept=0, color="grey80", lty=2) +
     geom_hline(yintercept=0, color="grey80", lty=2) +
+    geom_point(size=3) +
     theme_bw() +
     theme(panel.grid = element_blank(),
           legend.position = "top",
