@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# enONE <a href="https://thereallda.github.io/enONE/index.html"><img src="man/figures/logo.png" alt="enONE website" align="right" height="138"/></a>
+# enONE <a href="https://thereallda.github.io/enONE/index.html"><img src="man/figures/logo.jpg" alt="enONE website" align="right" height="138"/></a>
 
 <!-- badges: start -->
 <!-- badges: end -->

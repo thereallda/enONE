@@ -38,6 +38,10 @@ jobs:
         config: ${{ github.event.inputs.config }}
       id: rhub-setup
 
+    - name: Install dependencies
+      run: install.packages(c("tidyverse", "patchwork", "EnvStats"))
+      shell: Rscript {0}
+
   linux-containers:
     needs: setup
     if: ${{ needs.setup.outputs.containers != '[]' }}
