@@ -39,4 +39,3 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 URL: https://thereallda.github.io/enONE/
-LazyData: true
