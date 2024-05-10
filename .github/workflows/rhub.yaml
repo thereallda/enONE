@@ -37,6 +37,11 @@ jobs:
       with:
         config: ${{ github.event.inputs.config }}
       id: rhub-setup
+   
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        extra-packages: any::pkgdown, local::., any::rcmdcheck, any::XML
+        needs: website
 
     - name: Install dependencies
       run: install.packages(c("tidyverse", "patchwork", "EnvStats"))
