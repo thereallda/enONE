@@ -580,7 +580,6 @@ PCAplot <- function(object, use.pc=c(1,2),
   } else {
     counts_norm <- object
   }
-  
   # perform PCA
   pca <- prcomp(t(counts_norm))
   pc.var <- round(summary(pca)$importance[2,], 3)
@@ -598,9 +597,9 @@ PCAplot <- function(object, use.pc=c(1,2),
   var.length <- unlist(lapply(var.ls, length))
   var.ls <- var.ls[var.length == max(var.length)]
   map_df <- as.data.frame(Reduce(cbind, var.ls))
-  colnames(map_df) <- names(var.ls)
   # combine with pca_dat if not empty
   if (!any(dim(map_df) == 0)) {
+    colnames(map_df) <- names(var.ls)
     # re-assign class
     for (i in 1:ncol(map_df)) {
       class(map_df[,i]) <- class(var.ls[[i]])
@@ -611,7 +610,7 @@ PCAplot <- function(object, use.pc=c(1,2),
   # generate color palette
   if (!is.null(color) & is.null(palette)) {
     palette <- paintingr::paint_palette("Spring", length(unique(pca_dat$color)), "continuous")
-  }
+  } 
   
   # create aes mapping
   map_ls <- list(x = use.pc[1],

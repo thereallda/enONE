@@ -1,6 +1,6 @@
 Package: enONE
 Title: Epitranscriptional NAD-capped RNA analysis by spike-in based Omic-level Normalization and Evaluation
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: 
     person(given = "Dean",
            family = "Li",
@@ -39,3 +39,4 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 URL: https://thereallda.github.io/enONE/
+LazyData: true

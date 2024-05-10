@@ -1,0 +1,378 @@
+---
+title: "enONE_tutorial-zh"
+output:
+  html_document:
+    theme: united
+    df_print: kable
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{enONE_tutorial-zh}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}    
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## 前言
+
+细胞内的核苷类代谢物，如烟酰胺腺嘌呤二核苷酸（NAD），能够被添加到mRNA 5'末端，形成NAD帽修饰的RNA（NAD-RNA）；这类非经典起始核苷酸（NCIN）修饰的RNA被统称为NCIN帽修饰的RNA（NCIN-RNA）。NCIN-RNA天然地将代谢物与基因表达紧密地联系起来，定义了一种新颖但功能未知的表观转录修饰。NCIN-RNA的表征是功能研究的前提。当前NCIN-RNA的表征方法，如ONE-seq和DO-seq，实现了代谢物帽修饰RNA在细胞和组织中的鉴定。然而，这些方法产出的数据会受到源于化学酶促标记及亲和富集反应等实验操作误差的影响。因此，这里提出了`enONE`这种NAD-RNA表观转录组的计算分析方法，实现NAD-RNA数据的定量和比较分析。
+
+`enONE` 的R包可以在GitHub中找到（<https://github.com/thereallda/enONE>）
+
+## Setup
+
+在这个教程中，我们会使用人类外周血单核细胞（PBMCs）的NAD-RNA-seq数据来展示 `enONE` 的工作流程。
+
+要注意的是，这里混入了三种spike-in RNAs： 1. 来自模式生物黑腹果蝇的总RNA，用于 `enONE` 的normalization； 2. Synthetic RNA，其中含有5％的NAD修饰形式（相对于m7G-RNA），用于确定富集灵敏度； 3. Synthetic RNA，其为100％ m7G加帽的形式，用于确定富集特异性。
+
+![](images/Figure1.png)
+
+*Figure: Schematic workflow for total RNAs from PBMCs and three sets of spike-ins.*
+
+我们首先读取数据，包括基因表达量的count matrix和样本信息的metadata。matrix和样本信息的。metadata至少包括两列，即用于样本生物分组的"condition"列和用于样本富集分组的"enrich"列。
+
+```{r,warning=FALSE,message=FALSE}
+library(enONE)
+library(tidyverse)
+library(patchwork)
+
+# read in metadata and counts matrix
+counts_mat <- read.csv("D:/Academic/data/Counts.csv", row.names = 1)
+meta <- read.csv("D:/Academic/data/metadata.csv", comment.char = "#")
+head(meta)
+# rownames of metadata should be consistent with the colnames of counts_mat
+rownames(meta) <- meta$id
+```
+
+另外，metadata也可以包括其他信息，例如样本的批次信息。
+
+接下来，我们使用count matrix和metadata创建一个 `Enone` 对象。
+
+`Enone` 对象，包含了NAD-RNA-seq数据集的数据（raw and normalized counts data）和结果信息（例如，数据标准化性能的打分和NAD-RNA富集结果）。
+
+在构建 Enone 对象时，我们可以提供以下参数：
+
+-   spike-in 基因的前缀，例如果蝇Flybase基因id前缀为FB (`spike.in.prefix = "^FB"`)；
+-   synthetic spike-in的id (`synthetic.id = c("Syn1", "Syn2"`))，这需要与 `counts_mat` 中的行名相同；
+-   Input样本分组的id (`input.id = "Input"`) 和Enrichment样本分组的id (`enrich.id = "Enrich"`)，与`enrich`列相同。
+
+> 其中, "Syn1"代表5% NAD-RNA spike-in and "Syn2"代表100% m7G-RNA spike-in.
+>
+> **`synthetic.id` 是可选的参数.**
+
+```{r}
+# prefix of Drosophila spike-in genes
+spikeInPrefix <- "^FB"
+
+# create Enone
+Enone <- createEnone(data = counts_mat,
+                     col.data = meta,
+                     spike.in.prefix = spikeInPrefix,
+                     synthetic.id = c("Syn1", "Syn2"), 
+                     input.id = "Input",
+                     enrich.id = "Enrich"
+                     )
+Enone
+```
+
+## 标准流程
+
+`enONE` 流程包括以下四步:
+
+1.  质量控制（Quality control）;
+2.  基因集选取（Gene set selection）;
+3.  数据校正（Normalization procedures）;
+4.  数据校正效果评估（Normalization performance assessment）.
+
+### 质量控制（Quality control）
+
+`enONE` 首先进行质量控制步骤，通过 `FilterLowExprGene` 保留至少在 `n` 个样本中至少具有 `min.count` 的基因来完成此步骤。`n` 由 `group` 中指定的最小组样本大小确定。
+
+```{r}
+Enone <- FilterLowExprGene(Enone, group = Enone$condition, min.count = 20)
+Enone
+```
+
+此外，可以通过 `OutlierTest`对异常样本进行评估并进一步移除（`return=TRUE`）。由于没有样本被标记为异常值，因此我们将在后续分析中使用所有样本。
+
+```{r}
+## ronser"s test for outlier assessment
+OutlierTest(Enone, return=FALSE)
+```
+
+### 运行enONE
+
+`enONE` 函数可以进行基因选择、数据标准化和标准化效果评估。该函数在 `rowData` 中存储选择的基因集，在 counts slot中返回标准化计数矩阵（当 `return.norm=TRUE` 时），在 `enone_factor` slot中返回标准化因子，在 `enone_metrics` 和 `enone_scores` slots中返回评估指标和得分。以下是这些步骤的详细描述。
+
+```{r}
+Enone <- enONE(Enone, 
+               scaling.method = c("TC", "UQ", "TMM", "DESeq", "PossionSeq"),
+               ruv.norm = TRUE, ruv.k = 3,
+               eval.pam.k = 2:6, eval.pc.n = 3, 
+               return.norm = TRUE
+               )
+```
+
+#### 基因集选取（Gene set selection）
+
+`enONE` 定义了三组基因，包括：
+
+-   负对照（`NegControl`）：默认情况下，`enONE` 将 果蝇 spike-ins（或其他外源生物的RNA spike-in）中 FDR 排名最低的 1,000 个基因作为负对照（不富集的基因），用于校正无关误差。
+-   负评估（`NegEvaluation`）：默认情况下，`enONE` 将样本中 FDR 排名最低的 500 个基因作为负评估基因，用于评估无关误差。
+-   正评估（`PosEvaluation`）：默认情况下，`enONE` 将样本中 FDR 排名最高的 500 个基因作为正评估基因，用于评估研究感兴趣的差异。
+
+基因集的选择可以在 `enONE` 函数中使用 `auto=TRUE` 参数（默认值）自动定义，也可以在 `neg.control`, `pos.eval`, `neg.eval` 参数中分别提供。
+
+可以通过 `getGeneSet`函数和基因集的名称（即`"NegControl"`、`"NegEvaluation"`、`"PosEvaluation"`）来获取相应的基因集。
+
+```{r}
+getGeneSet(Enone, name = "NegControl")[1:5]
+```
+
+#### 数据校正（Normalization）
+
+`enONE` 整合了全局缩放（global scaling）和基于回归的校正方法（regression-based normalization）来产生normalization方法。
+
+对于全局缩放方法，`enONE` 整合了五种方法，包括：
+
+1.  Total Count (TC);
+
+2.  Upper-Quartile (UQ);
+
+3.  Trimmed Mean of M Values (TMM);
+
+4.  DESeq;
+
+5.  PossionSeq.
+
+默认情况下，`enONE` 使用所有缩放方法，但用户可以在 `scaling.method` 参数中选择要使用的缩放程序。
+
+对于regression-based方法，`enONE` 利用了三种RUV的方法，包括：
+
+1.  RUVg;
+
+2.  RUVs;
+
+3.  RUVse.
+
+例如，您可以通过选择 `ruv.norm=TRUE, ruv.k=2` 来执行使用前两个无关误差因子的 RUV。
+
+> RUVse 是类似于 RUVs 的方法。它基于每个富集样本或背景样本组的重复样本中的负对照基因来估计无关误差因子，其假设富集效应在重复之间是相对稳定的。
+
+所有使用的normalization方法都可以使用 `listNormalization` 来提取。
+
+```{r}
+listNormalization(Enone)
+```
+
+校正后的数据可以通过 `Counts` 函数获取。
+
+```{r}
+head(enONE::Counts(Enone, slot="sample", method="DESeq_RUVg_k2"))[,1:5]
+```
+
+#### 数据校正效果评估
+
+`enONE` 利用了八个与基因表达分布的不同方面相关的标准化性能指标来评估数据标准化的性能。这八个指标分别为：
+
+-   `BIO_SIM`：生物组的相似性。通过计算前三个表达PCs（默认情况下）上的欧氏距离度量，由 `condition` 列定义的聚类的平均轮廓宽度。`BIO_SIM`越大越好。
+-   `EN_SIM`：富集组的相似性。通过计算前三个表达PCs（默认情况下）上的欧氏距离度量，由 `enrich` 列定义的聚类的平均轮廓宽度。`EN_SIM` 越大越好。
+-   `BAT_SIM`：批次组的相似性。通过计算前三个表达PCs（默认情况下）上的欧氏距离度量，由 `batch` 列定义的聚类的平均轮廓宽度。`BAT_SIM` 越小越好。
+-   `PAM_SIM`：PAM 聚类组的相似性。通过计算前三个表达PCs（默认情况下）上的欧氏距离度量，由 PAM 聚类（根据 `eval.pam.k` 进行聚类）定义的聚类的最大平均轮廓宽度。`PAM_SIM` 越大越好。
+-   `WV_COR`：研究相关变量的保留程度。对原始计数的正评估基因（`PosEvaluation`）子矩阵的前 `eval.pc.n` 个PCs 进行回归的 R^2^ 测量。`WV_COR` 越大越好。
+-   `UV_COR`：无关误差移除的程度。对原始计数的负评估基因（`NegEvaluation`）子矩阵的前 `eval.pc.n` 个PCs 进行回归的 R^2^ 测量。`UV_COR` 越小越好。
+-   `RLE_MED`：平均平方中位数相对对数表达（RLE）。`RLE_MED` 越小越好。
+-   `RLE_IQR`：相对于四分位距（IQR）的方差。`RLE_IQR` 越小越好。
+
+评估指标可以通过 `getMetrics` 进行获取。
+
+```{r}
+getMetrics(Enone)[1:5,]
+```
+
+评估指标通过转换为秩值，并通过平均各指标的秩值来获得特定方法的打分（score）。数据标准化效果的打分可以通过 `getScore` 获取。
+
+```{r}
+getScore(Enone)[1:5,]
+```
+
+## 选择数据标准化方法
+
+`enONE` 提供了biplot来探索数据校正方法的全空间，可以通过 `interactive=TRUE` 来开启交互模式。
+
+```{r, fig.width=10, fig.height=10}
+# get performance score
+enScore <- getScore(Enone)
+# perform PCA based on evaluation score, excluding BAT_SIM column (3) if no batch information provided, and SCORE column (9).
+# pca.eval <- prcomp(enScore[,-c(3, 9)], scale = TRUE)
+pca.eval <- prcomp(enScore[,-c(9)], scale = TRUE)
+# pca biplot
+PCA_Biplot(pca.eval, score = enScore$SCORE, interactive = FALSE)
+```
+
+在这个图中，每个点对应一个标准化程序，并颜色代表性能得分（八个性能指标rank的均值）。蓝色箭头对应于性能指标的PCA载荷。蓝色箭头的方向和长度可以解释为每个指标对前两个主成分的贡献程度。
+
+这里使用打分最高的标准化程序 `DESeq_RUVg_k2` 进行下游分析。
+
+```{r}
+# select normalization
+norm.method <- rownames(enScore[1,])
+
+# get normalized counts
+norm.data <- enONE::Counts(Enone, slot = "sample", method = norm.method)
+
+# get normalization factors
+norm.factors <- getFactor(Enone, slot = "sample", method = norm.method)
+
+norm.method
+```
+
+> 需要注意的是，如果 `enONE` 运行的时候没有返回校正后数据（i.e., `return.norm=FALSE`），可以通过下面的代码手动执行数据标准化。
+>
+> ```{r, eval=FALSE}
+> # perform normalization
+> Enone <- UseNormalization(Enone, slot = "sample", method = norm.method)
+> # get normalized counts
+> norm.data <- Counts(Enone, slot = "sample", method = norm.method)
+> ```
+
+## 数据校正的效果
+
+这里使用PCA展示数据校正的效果。
+
+```{r, fig.width=12, fig.height=6}
+# create sample name, e.g., Y3.Input
+samples_name <- paste(Enone$condition, Enone$replicate, sep=".")
+
+# PCA for raw count
+p1 <- PCAplot(enONE::Counts(Enone, slot="sample", "Raw"), 
+            color = Enone$batch,
+            shape = Enone$enrich,
+            label = samples_name, 
+            vst.norm = TRUE) + 
+  ggtitle("Before normalization")
+
+# PCA for normalized count
+p2 <- PCAplot(log1p(norm.data), 
+            color = Enone$batch,
+            shape = Enone$enrich,
+            label = samples_name, 
+            vst.norm = FALSE) + 
+  ggtitle("After normalization")
+
+# combine two plots
+p1 + p2
+```
+
+## 鉴定富集基因
+
+`enONE` 可用于富集基因的鉴定。`FindEnrichment` 函数自动地根据 `condition` 列中的每个生物学分组鉴定富集的基因。
+
+默认情况下，富集基因（即NAD-RNA）为Enrichment/Input ≥ 2（**`logfc.cutoff = 1`**），FDR \< 0.05（**`p.cutoff = 0.05`**）的基因。
+
+使用**`getEnrichment`**函数可以获取一个列表包含了各组的富集结果。
+
+```{r}
+# find all enriched genes
+Enone <- FindEnrichment(Enone, slot="sample", norm.method = norm.method, 
+                        logfc.cutoff = 1, p.cutoff = 0.05)
+
+# get filtered enrichment results
+res.sig.ls <- getEnrichment(Enone, slot="sample", filter=TRUE)
+
+# count number of enrichment in each group
+unlist(lapply(res.sig.ls, nrow))
+```
+
+`res.sig.ls` 中每个表都是一个**`data.frame`**，其中行为基因，列为基因的相关信息（GeneID、logFC、p值等）。表格中包含以下列：
+
+-   **`GeneID`**：基因的ID。
+
+-   **`logFC`**：富集样本和输入样本之间的log2倍变化。正值表示基因在富集组中更高度富集。
+
+-   **`logCPM`**：所有样本平均表达的log2 CPM（counts per million）。
+
+-   **`LR`**：似然比检验的似然比。
+
+-   **`PValue`**：来自似然比检验的p值。
+
+-   **`FDR`**：p值的假阳性发现率，默认使用\"BH\"方法。
+
+```{r}
+head(res.sig.ls[[1]])
+```
+
+`enONE` 提供 `reduceRes` 函数将各个富集表格的结果转换到同一个 `data.frame` 中。接着，可以使用 `BetweenStatPlot` 可视化各组NAD-RNA修饰水平。
+
+```{r}
+# simplify group id
+names(res.sig.ls) <- c("Young", "Mid", "Old")
+
+# logfc.col specify the name of logFC column
+nad_df1 <- reduceRes(res.sig.ls, logfc.col = "logFC")
+
+# convert the Group column as factor
+nad_df1$Group <- factor(nad_df1$Group, levels = unique(nad_df1$Group))
+
+# draw plot
+bxp1 <- BetweenStatPlot(nad_df1, x="Group", y="logFC", color="Group", 
+                        step.increase = 0.6, add.p = "p", 
+                        comparisons = list(c("Young", "Mid"), 
+                                           c("Young", "Old")))
+bxp1
+```
+
+## 处理synthetic spike-in
+
+由于样本中加入了synthetic RNA，其中一个带有5%的NAD帽，另一个带有100%的m7G帽，我们可以利用这些spike-ins来确定捕获的灵敏度和特异性。
+
+**`synEnrichment`**计算具有给定标准化方法的spike-ins的富集水平。**`DotPlot`**可用于可视化spike-in的富集水平。
+
+```{r}
+# compute synthetic spike-in enrichment
+syn_level <- synEnrichment(Enone, method=norm.method, log=TRUE)
+
+# transform to long format
+syn_df <- as.data.frame(syn_level) %>% 
+  rownames_to_column("syn_id") %>% 
+  pivot_longer(cols = -syn_id,
+               names_to = "id",
+               values_to = "logFC") %>% 
+  left_join(meta[,c("id","condition")], by="id")
+
+# remove suffix of condition for simplification
+syn_df$condition <- gsub("\\..*", "", syn_df$condition)
+
+# rename facet label
+samples_label <- setNames(c("5% NAD-RNA", "100% m7G-RNA"), 
+                          nm=c("Syn1", "Syn2"))
+
+# draw dotplot
+DotPlot(syn_df, x="syn_id", y="logFC", fill="syn_id") +
+  theme(legend.position = "none") +
+  scale_x_discrete(labels=samples_label)
+```
+
+Syn1, which contained 5% NAD-RNA, are significantly enriched, whereas no enrichment is found for Syn2 made up with 100% m7G-RNA.
+
+```{r,eval=FALSE}
+# save Enone data
+save(Enone, file="data/Enone.RData")
+```
+
+## Session Info
+
+<details>
+
+<summary>**Session Info**</summary>
+
+```{r}
+sessionInfo()
+```
+
+</details>

@@ -32,13 +32,14 @@ Notably, we included three types of spike-in RNAs:
 
 1.  Total RNAs from *Drosophila melanogaster*, an invertebrate model organism with well-annotated genome sequence, for estimating the unwanted variation;
 2.  Synthetic RNAs, consisting of 5% NAD- relative to m7G-capped forms, were used to determine the capture sensitivity;
-3.  Synthetic RNAs, with 100% m7G-capped forms, were used to determine the capture specificity (Figure1 below).
+3.  Synthetic RNAs, with 100% m7G-capped forms, were used to determine the capture specificity (Figure below).
 
 ![](images/Figure1.png)
 
-*Figure 1: Schematic workflow for total RNAs from PBMCs and three sets of spike-ins.*
+*Figure: Schematic workflow for total RNAs from PBMCs and three sets of spike-ins.*
 
-We start by reading in the data, including count matrix and metadata. It is recommended to provide the assay group of samples with the `assay` column in metadata.
+We start by reading in the data, including count matrix and metadata. metadata should include at lease two columns, namely the `condition` column for biological grouping of samples, and the `enrich` column for enrichment grouping of samples. 
+
 
 ```{r,warning=FALSE,message=FALSE}
 library(enONE)
@@ -46,12 +47,16 @@ library(tidyverse)
 library(patchwork)
 
 # read in metadata and counts matrix
-counts_mat <- read.csv("data/Counts.csv", row.names = 1)
-meta <- read.csv("data/metadata.csv", comment.char = "#")
+counts_mat <- read.csv("D:/Academic/data/Counts.csv", row.names = 1)
+meta <- read.csv("D:/Academic/data/metadata.csv", comment.char = "#")
 head(meta)
+# rownames of metadata should be consistent with the colnames of counts_mat
+rownames(meta) <- meta$id
 ```
 
-Next, we use the count matrix to create a `Enone` object.
+Also, other information, such as batch group can be included in the metadata. 
+
+Next, we use the count matrix and metadata to create a `Enone` object.
 
 The `Enone` object serves as a container that contains both data (raw and normalized counts data) and analysis (e.g., normalization performance evaluation score and enrichment results) for a NAD-RNA-seq dataset.
 
@@ -61,11 +66,11 @@ When constructing `Enone` object, we can provide following arguments:
 
 -   The id of synthetic spike-in (`synthetic.id = c("Syn1", "Syn2")`), same with row names in `counts_mat`;
 
--   The id of input (`input.id = "Input"`) and enrichment (`enrich.id = "Enrich"`), same as the assay column.
+-   The id of input (`input.id = "Input"`) and enrichment (`enrich.id = "Enrich"`), same as the enrich column.
 
 > Here, "Syn1" represent the spike-in with 5% NAD-RNA and "Syn2" is the spike-in with 100% m7G-RNA.
 >
-> **Notably, `batch.group` , `synthetic.id` are optional.**
+> **Notably, `synthetic.id` are optional.**
 
 ```{r}
 # prefix of Drosophila spike-in genes
@@ -73,9 +78,7 @@ spikeInPrefix <- "^FB"
 
 # create Enone
 Enone <- createEnone(data = counts_mat,
-                     bio.group = meta$condition,
-                     enrich.group = meta$assay,
-                     batch.group = meta$batch,
+                     col.data = meta,
                      spike.in.prefix = spikeInPrefix,
                      synthetic.id = c("Syn1", "Syn2"), 
                      input.id = "Input",
@@ -179,20 +182,20 @@ listNormalization(Enone)
 Normalized counts can be assessed by `Counts`
 
 ```{r}
-head(Counts(Enone, slot="sample", method="DESeq_RUVg_k2"))[,1:5]
+head(enONE::Counts(Enone, slot="sample", method="DESeq_RUVg_k2"))[,1:5]
 ```
 
 #### Evaluation
 
 To evaluate the performance of normalization, `enONE` leverages eight normalization performance metrics that related to different aspects of the distribution of gene expression measures. The eight metrics are listed as below:
 
-1.  `BIO_SIM`: Similarity of biological groups. The average silhouette width of clusters defined by `bio.group`, computed with the Euclidean distance metric over the first 3 expression PCs (default). Large values of `BIO_SIM` is desirable.
+1.  `BIO_SIM`: Similarity of biological groups. The average silhouette width of clusters defined by `condition` column, computed with the Euclidean distance metric over the first 3 expression PCs (default). Large values of `BIO_SIM` is desirable.
 
-2.  `EN_SIM`: Similarity of enrichment groups. The average silhouette width of clusters defined by `en.group`, computed with the Euclidean distance metric over the first 3 expression PCs (default). Large values of `EN_SIM` is desirable.
+2.  `EN_SIM`: Similarity of enrichment groups. The average silhouette width of clusters defined by `enrich` column, computed with the Euclidean distance metric over the first 3 expression PCs (default). Large values of `EN_SIM` is desirable.
 
-3.  `BAT_SIM`: Similarity of batch groups. The average silhouette width of clusters defined by `batch.group`, computed with the Euclidean distance metric over the first 3 expression PCs (default). Low values of `BAT_SIM` is desirable.
+3.  `BAT_SIM`: Similarity of batch groups. The average silhouette width of clusters defined by `batch` column, computed with the Euclidean distance metric over the first 3 expression PCs (default). Low values of `BAT_SIM` is desirable.
 
-4.  `PAM_SIM`: Similarity of PAM clustering groups. The maximum average silhouette width of clusters defined by PAM clustering (cluster by `eval.pam.k`), computed with the Euclidean distance metric over the first 3 expression PCs (default). Large values of `BAT_SIM` is desirable.
+4.  `PAM_SIM`: Similarity of PAM clustering groups. The maximum average silhouette width of clusters defined by PAM clustering (cluster by `eval.pam.k`), computed with the Euclidean distance metric over the first 3 expression PCs (default). Large values of `PAM_SIM` is desirable.
 
 5.  `WV_COR`: Preservation of biological variation. R^2^ measure for regression of first 3 expression PCs on first `eval.pc.n` PCs of the positive evaluation genes (`PosEvaluation`) sub-matrix of the raw count. Large values of `WV_COR` is desirable.
 
@@ -237,7 +240,7 @@ Here, we use the top-ranked procedure DESeq_RUVg_k2 for downstream analysis.
 norm.method <- rownames(enScore[1,])
 
 # get normalized counts
-norm.data <- Counts(Enone, slot = "sample", method = norm.method)
+norm.data <- enONE::Counts(Enone, slot = "sample", method = norm.method)
 
 # get normalization factors
 norm.factors <- getFactor(Enone, slot = "sample", method = norm.method)
@@ -263,7 +266,7 @@ We perform PCA based on the count matrix from sample of interest before and afte
 samples_name <- paste(Enone$condition, Enone$replicate, sep=".")
 
 # PCA for raw count
-p1 <- PCAplot(Counts(Enone, slot="sample", "Raw"), 
+p1 <- PCAplot(enONE::Counts(Enone, slot="sample", "Raw"), 
             color = Enone$batch,
             shape = Enone$enrich,
             label = samples_name, 
@@ -286,7 +289,7 @@ p1 + p2
 
 `enONE` package can help you find enrichment genes from each biological groups via differential expression. It can identify genes that significantly increased in enrichment samples compared to input samples.
 
-`FindEnrichment` automates this processes for all groups provided in `bio.group`.
+`FindEnrichment` automates this processes for all groups provided in `condition` column.
 
 By default, enriched genes (NAD-RNA in here) are defined as fold change of normalized transcript counts ≥ 2 (`logfc.cutoff = 1`), FDR \< 0.05 (`p.cutoff = 0.05`) in enrichment samples compared to those in input samples.
 

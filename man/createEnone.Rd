@@ -8,9 +8,7 @@
 \usage{
 createEnone(
   data,
-  bio.group,
-  enrich.group,
-  batch.group = NULL,
+  col.data,
   spike.in.prefix = NULL,
   input.id = "Input",
   enrich.id = "Enrich",
@@ -21,17 +19,14 @@ createEnone(
 \item{data}{A un-normalized count data matrix of shape n x p, where n is the
 number of samples and p is the number of features.}
 
-\item{bio.group}{Vector of samples group, e.g., c("Young.Input","Young.Enrich","Old.Input","Old.Enrich").}
-
-\item{enrich.group}{Vector of enrichment group, e.g., c("Input","Enrich","Input","Enrich").}
-
-\item{batch.group}{Vector of samples batch, e.g., c("A","A","B","B"), default: NULL.}
+\item{col.data}{\code{data.frame} with at least two columns (indicate condition and enrich groups).
+Rows of \code{col.data} correspond to columns of \code{data}.}
 
 \item{spike.in.prefix}{A character specify the prefix of spike-in id, e.g., "^FB" stands for fly spike-in id, default: NULL.}
 
-\item{input.id}{Input library id, must be consistent with \code{enrich.group}, e.g., "Input".}
+\item{input.id}{Input library id, must be consistent with the enrich column of \code{col.data}, e.g., "Input".}
 
-\item{enrich.id}{Enrich library id, must be consistent with \code{enrich.group}, e.g., "Enrich".}
+\item{enrich.id}{Enrich library id, must be consistent with the enrich column of \code{col.data}, e.g., "Enrich".}
 
 \item{synthetic.id}{Vector of synthetic RNA id, e.g. c("Syn1","Syn2"), default: NULL.}
 }
@@ -43,13 +38,13 @@ Enone object
 The \code{createEnone} is a easy constructor of \code{Enone} object
 }
 \details{
-Description of each slot:
-\code{assay} \code{SummarizedExperiment::Assays} object, contains all counts.
-\code{counts} list for holding raw/normalized counts of sample and spike_in.
-\code{enone_factor} list for holding normalization factors of sample and spike_in.
-\code{enone_metrics} data frame with normalization methods in row and metrics in columns.
-\code{enone_score} data frame with normalization methods in row and scores in columns.
-\code{enrichment} list for holding all differential analysis results.
-\code{enrichment_filtered} lists for holding filtered differential analysis results.
-\code{parameter} list of parameters.
+Description of each slot: \cr
+\code{assay} \code{SummarizedExperiment::Assays} object, contains all counts. \cr
+\code{counts} list for holding raw/normalized counts of sample and spike_in. \cr
+\code{enone_factor} list for holding normalization factors of sample and spike_in. \cr
+\code{enone_metrics} data frame with normalization methods in row and metrics in columns. \cr
+\code{enone_score} data frame with normalization methods in row and scores in columns. \cr
+\code{enrichment} list for holding all differential analysis results. \cr
+\code{enrichment_filtered} lists for holding filtered differential analysis results. \cr
+\code{parameter} list of parameters.\cr
 }

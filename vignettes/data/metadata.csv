@@ -1,4 +1,4 @@
-id,sample.id,condition,batch,assay
+id,sample.id,condition,batch,enrich
 D1,Y2,Y.Input,D,Input
 D2,Y10,Y.Input,D,Input
 D3,Y14,Y.Input,D,Input
