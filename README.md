@@ -22,3 +22,9 @@ devtools::install_github("thereallda/enONE")
 ```
 
 Tutorial can be found at <https://thereallda.github.io/enONE/>
+
+> If you use `enONE` for your analysis, please cite the publication:
+>
+> **Epitranscriptome analysis of NAD-capped RNA by spike-in-based
+> normalization and prediction of chronological age**
+> (<https://doi.org/10.1016/j.isci.2023.108558>)

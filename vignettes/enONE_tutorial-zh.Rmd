@@ -91,7 +91,7 @@ Enone
 
 ### 质量控制（Quality control）
 
-`enONE` 首先进行质量控制步骤，通过 `FilterLowExprGene` 保留至少在 `n` 个样本中至少具有 `min.count` 的基因来完成此步骤。`n` 由 `group` 中指定的最小组样本大小确定。
+`enONE` 首先进行质量控制步骤，通过 `FilterLowExprGene` 保留至少在 `n` 个样本中至少具有 `min.count` 的基因来完成此步骤。`n` 由 `group` 中指定的最小样本组的大小确定。
 
 ```{r}
 Enone <- FilterLowExprGene(Enone, group = Enone$condition, min.count = 20)
@@ -358,7 +358,7 @@ DotPlot(syn_df, x="syn_id", y="logFC", fill="syn_id") +
   scale_x_discrete(labels=samples_label)
 ```
 
-Syn1, which contained 5% NAD-RNA, are significantly enriched, whereas no enrichment is found for Syn2 made up with 100% m7G-RNA.
+其中，具有5% NAD-RNA的Syn1有明显富集，而100% m7G-RNA的Syn2并没有出现富集，表明了富集实验的特异性。
 
 ```{r,eval=FALSE}
 # save Enone data

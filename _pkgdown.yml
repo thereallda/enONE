@@ -11,7 +11,7 @@ navbar:
         - text: "enONE Tutorial"
           href: articles/enONE_tutorial.html
         - text: "enONE Tutorial - Chinese"
-        href: articles/enONE_tutorial-zh.html
+          href: articles/enONE_tutorial-zh.html
     - text: "Reference"
       href: reference/index.html
   right:
