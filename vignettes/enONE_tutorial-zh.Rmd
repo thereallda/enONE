@@ -42,8 +42,8 @@ library(tidyverse)
 library(patchwork)
 
 # read in metadata and counts matrix
-counts_mat <- read.csv("D:/Academic/data/Counts.csv", row.names = 1)
-meta <- read.csv("D:/Academic/data/metadata.csv", comment.char = "#")
+counts_mat <- read.csv("data/Counts.csv", row.names = 1)
+meta <- read.csv("data/metadata.csv", comment.char = "#")
 head(meta)
 # rownames of metadata should be consistent with the colnames of counts_mat
 rownames(meta) <- meta$id
