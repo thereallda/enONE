@@ -27,7 +27,6 @@ Imports:
     paintingr,
     pbapply,
     plotly,
-    rlang,
     rstatix,
     S4Vectors,
     stats,
@@ -36,6 +35,8 @@ Imports:
     tibble
 Suggests: 
     knitr,
-    rmarkdown
+    patchwork,
+    rmarkdown,
+    tidyr
 VignetteBuilder: knitr
 URL: https://thereallda.github.io/enONE/

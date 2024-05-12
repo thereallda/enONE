@@ -38,12 +38,26 @@ Notably, we included three types of spike-in RNAs:
 
 *Figure: Schematic workflow for total RNAs from PBMCs and three sets of spike-ins.*
 
+Raw data for this tutorial can be downloaded with the following code.
+
+```{r,warning=FALSE}
+# create directory for data
+dir.create("data/")
+options(timeout = max(6000, getOption("timeout")))
+# download Counts.csv
+download.file("https://figshare.com/ndownloader/files/46250704", destfile = "data/Counts.csv")
+# download metadata.csv
+download.file("https://figshare.com/ndownloader/files/46251412", destfile = "data/metadata.csv")
+```
+
 We start by reading in the data, including count matrix and metadata. metadata should include at lease two columns, namely the `condition` column for biological grouping of samples, and the `enrich` column for enrichment grouping of samples. 
 
 
 ```{r,warning=FALSE,message=FALSE}
 library(enONE)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
 library(patchwork)
 
 # read in metadata and counts matrix
@@ -352,7 +366,7 @@ syn_level <- synEnrichment(Enone, method=norm.method, log=TRUE)
 
 # transform to long format
 syn_df <- as.data.frame(syn_level) %>% 
-  rownames_to_column("syn_id") %>% 
+  tibble::rownames_to_column("syn_id") %>% 
   pivot_longer(cols = -syn_id,
                names_to = "id",
                values_to = "logFC") %>% 

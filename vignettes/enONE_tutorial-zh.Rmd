@@ -34,11 +34,25 @@ knitr::opts_chunk$set(
 
 *Figure: Schematic workflow for total RNAs from PBMCs and three sets of spike-ins.*
 
+通过以下代码下载原始数据。
+
+```{r,warning=FALSE}
+# create directory for data
+dir.create("data/")
+options(timeout = max(6000, getOption("timeout")))
+# download Counts.csv
+download.file("https://figshare.com/ndownloader/files/46250704", destfile = "data/Counts.csv")
+# download metadata.csv
+download.file("https://figshare.com/ndownloader/files/46251412", destfile = "data/metadata.csv")
+```
+
 我们首先读取数据，包括基因表达量的count matrix和样本信息的metadata。matrix和样本信息的。metadata至少包括两列，即用于样本生物分组的"condition"列和用于样本富集分组的"enrich"列。
 
 ```{r,warning=FALSE,message=FALSE}
 library(enONE)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
 library(patchwork)
 
 # read in metadata and counts matrix
@@ -339,7 +353,7 @@ syn_level <- synEnrichment(Enone, method=norm.method, log=TRUE)
 
 # transform to long format
 syn_df <- as.data.frame(syn_level) %>% 
-  rownames_to_column("syn_id") %>% 
+  tibble::rownames_to_column("syn_id") %>% 
   pivot_longer(cols = -syn_id,
                names_to = "id",
                values_to = "logFC") %>% 
