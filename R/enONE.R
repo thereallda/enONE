@@ -169,10 +169,10 @@ enONE <- function(object,
     # store normalized counts
     object@counts$sample <- lapply(norm.ls, function(i) { i$dataNorm })
     # store normalization factors
-    object@enone_factor$sample <- lapply(norm.ls, function(i) { i[c("normFactor", "adjustFactor")] })
+    object@enone_factor$sample <- lapply(norm.ls, function(i) { i[c("normFactor", "adjustFactor", "alpha")] })
     # rename factor slot
     for (i in 1:length(object@enone_factor$sample)) { 
-      names(object@enone_factor$sample[[i]]) <- c("normFactor", "adjustFactor")
+      names(object@enone_factor$sample[[i]]) <- c("normFactor", "adjustFactor", "alpha")
       }
   } 
   
