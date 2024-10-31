@@ -1,6 +1,6 @@
 Package: enONE
 Title: Epitranscriptional NAD-capped RNA analysis by spike-in based Omic-level Normalization and Evaluation
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person(given = "Dean",
            family = "Li",
